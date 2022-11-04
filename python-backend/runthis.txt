@@ -1,0 +1,2 @@
+export GOOGLE_APPLICATION_CREDENTIALS="/Users/vaze/desktop/thesis-server-code/smartglasses-education/keys/thesis-gcp-api-97828526cbc3.json" 
+

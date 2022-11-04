@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "thesis-gcp-api",
+  "private_key_id": "97828526cbc33c64792172cc05974b8e86a9e5cb",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCmrlYCU01ESLk5\nxTDi8B0czD37lzlXptJUOkkx4J/0ZKUk6r4TTwPAvujQ/Zwfnd+Ns3mC86YpQ78f\nXAFVvJRgChFCR9jobI2BNu8fno8NAaps5V5SzrJmsV3CfpS8AS91MS1sjWyvfJyi\nwGJLk4Fq60GtkfuKPVG7KOC28NTqEObaMxGaXuOwsWaAX4kbum+THkem6tY3hJ5+\nMREOvjGC2vHbiF7DrwQU7Pf5yGLwmXCENMUrAbdJ5ZGntcgtJwq1t9BQQ4oLv2rD\nLDBxuVDgrF2YDPru+JqEKeMwRAxarR4fjpCEwlDxHe+eTGs8o4dqLZ4NvelkCx8Z\nN9QR6BrZAgMBAAECggEAFU2CwJlU7r08rx18ugRmNCAGa/lP4tv3Vbx9TlqfFuUm\nFinKUT1wBVpg9xTytze+MqYViZ8KRYvbCW8A3KxValDfE9GK72mwTCtxNGFXdxoX\nZgOKopq4Qle42/rBl6WvIxM98vnAQk1y13ovFemsSLX4lu5pb6mWoI0A62CsVZ3O\nU/gdJBfZ+axaLW0IBmU/DnB1MJdRwl8uMqB+YY1MlRCnspKpJBWVRo+WzVdMlNV8\nTIuJDJZH1zKz/Lg+1fgLKmrjAhGbrI4erDSsIyQYa4gKrZZVMDTwcXwqFyvSPK7k\nQijDNKko/rzrHh/e8u+stRoJKMZiX+RpKdYr3O794QKBgQDkCXCXygydaAlhYaq3\n7yGdIgCWmHh/Z117tCN//RvNESqV6LTU7ZkhZSkKg+bGw/ySl6p6hdnRvM/1TTD3\nspd1T/QLntvQWvml+Qzr5RaxTeguLoyWCnWGhhzOC3j3s86z9XFAg5o72PdPCtn1\n0Hkw1tGSyaACpKNnsX54xGLyywKBgQC7Hs4tpKV3YiLjz/+26DfUh6Al5jWhF4VB\nDZPFVML4DgOXQ+5SIHR39FLNCOOB4rVId6ueQ1+CW520VUE4sZwE0WhmpoF3ur4X\nHiF1NlEX4fkNvhIJPyjVsOPlXNl2ryXIRJzIIwJ/8o926qUpS3GAPZNbImN9ater\nO7ugpfHgawKBgCEpykkY5krCBZM2+/fx/AZ5GnLMS8Hji3HhGcSUT8W7+GCCzkGl\nKD72EkjoM9i2SfYbvnxBGRNqjSfUiQmM3IAAF7LU8IzVnjboCFwKHgm9FcYZmPJ9\nJOhieq/wdTA44xfC2yyRtw17GURShK4+GlHi++mIDxAzV1xOMOFpViaPAoGBAI3x\nVlGFXgdrqC/L7pyfFwrfPvrA4Nmsb+bjF79PBv8IEm1CmJwwBmmgKtdh8MLsaLvq\nG4NYdDD8smrDaVBKWqHFAD8t+3QJcn0y3AqAA4/sWPK1xhTBloZTQu0QO94uCqka\ncxvWguTv6Sg54sOqeRTgoNE3CuVukN9R1oiMmSi1AoGBAIymZwGquNr2MhnPe6Zl\nW20h6PMVFDpWGn8jAqP4qjI45tVSrLlWGhdqWd8/uwaqRlJml3b6M3mnOBpKzqhR\nzN7fYxhzcOOOTU6jTcV0McdTa/0GekK5B0F7mUuLIJ1LlReGThpAUYyPoNnNMeFq\nVV0oKCc726Jz4HbPyDLuhUV5\n-----END PRIVATE KEY-----\n",
+  "client_email": "service-account-for-quickstart@thesis-gcp-api.iam.gserviceaccount.com",
+  "client_id": "118003792639672454468",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/service-account-for-quickstart%40thesis-gcp-api.iam.gserviceaccount.com"
+}

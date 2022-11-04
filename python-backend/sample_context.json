@@ -1,0 +1,58 @@
+{ "data":[
+    {
+        "objects":[
+            {
+                "pen" : {
+                    "position":{
+                        "x": 0.3,
+                        "y":0.5,
+                        "z":0.2
+                    },
+                    "stucture_details":{
+                        "shape": "cylinder",
+                        "material": "plastic",
+                        "color": "black"
+                    }
+                },
+                "cup" : {
+                    "position":{
+                        "x": 0.6,
+                        "y":0.2,
+                        "z":0.6
+                    },
+                    "stucture_details":{
+                        "shape": "truncated cone",
+                        "material": "paper",
+                        "color": "red and white"
+                    }
+                },
+                "laptop" : {
+                    "position":{
+                        "x": 0.8,
+                        "y":0.2,
+                        "z":0.6
+                    },
+                    "stucture_details":{
+                        "shape": "truncated cone",
+                        "material": "paper",
+                        "color": "red and white"
+                    }
+                }
+            }
+        ],
+        "meta":[
+            {
+                "user_task_action": {
+                        "task" : "work",
+                        "number_of_people":3,
+                        "space": "office"
+                    },
+                "user_preferences": {
+                    "topic_of_interest":"physics",
+                    "lesson_detail":"short"
+                    }
+               
+            }
+        ]
+    }
+]}
