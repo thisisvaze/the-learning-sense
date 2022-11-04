@@ -37,14 +37,13 @@ import Constants.Values
 def main():
     hololens_connection_manager = hololens_connection.HololensConnectionManager(
         show_stream=False)
-
+    obj_detection_manager = multiple_object_detection.norfair_yolo_detection()
     print(hololens_connection_manager.ip_address)
     while True:
-        hololens_connection_manager.videoStream.show_frame()
+        # hololens_connection_manager.videoStream.show_frame()
         current_frame = hololens_connection_manager.videoStream.get_current_frame(
             mode="opencv")
-        obj_detection = multiple_object_detection.norfair_yolo_detection()
-        # print(obj_detection.trackMultipleObjects(current_frame))
+        obj_detection_manager.trackMultipleObjects(current_frame)
         # multiple_object_detection.trackMultipleObjects(current_frame)
 
 

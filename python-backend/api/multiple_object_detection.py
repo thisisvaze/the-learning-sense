@@ -8,6 +8,7 @@ import requests
 from api.norfair_utilities import YOLO, yolo_detections_to_norfair_detections, names
 from . import norfair_utilities
 import cv2
+import Constants.Values as CONSTANTS
 from api.norfair_utilities import Detection, Paths, Tracker, Video
 from norfair.distances import frobenius, iou
 import norfair
@@ -20,7 +21,7 @@ MAX_DISTANCE: int = 10000
 class norfair_yolo_detection(object):
     def __init__(self, track_points="bbox"):
         self.track_points = track_points
-        self.model = YOLO("custom_models/yolov7.pt")
+        self.model = YOLO(CONSTANTS.YOLO_V7_MODEL_PATH)
         distance_function = iou if track_points == "bbox" else frobenius
         distance_threshold = (
             DISTANCE_THRESHOLD_BBOX
