@@ -32,19 +32,21 @@ import cv2
 from api.norfair_utilities import Detection, Paths, Tracker, Video
 from norfair.distances import frobenius, iou
 import Constants.Values
+from zed import zed_connection
+import context_handler
 
 
 def main():
-    hololens_connection_manager = hololens_connection.HololensConnectionManager(
+    # hololens_connection_manager = hololens_connection.HololensConnectionManager(
+    #  show_stream=False)
+    zed_connection_manager = zed_connection.ZedConnectionManager(
         show_stream=False)
-    obj_detection_manager = multiple_object_detection.norfair_yolo_detection()
-    print(hololens_connection_manager.ip_address)
+    context_handler_obj = context_handler.context(
+        sensor_connection_manager=zed_connection_manager)
+
     while True:
-        # hololens_connection_manager.videoStream.show_frame()
-        current_frame = hololens_connection_manager.videoStream.get_current_frame(
-            mode="opencv")
-        obj_detection_manager.trackMultipleObjects(current_frame)
-        # multiple_object_detection.trackMultipleObjects(current_frame)
+        context_handler_obj.env_context.getData()
+        time.sleep(0.01)
 
 
 if __name__ == "__main__":

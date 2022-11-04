@@ -10,7 +10,7 @@
         language: {topic: french}
 
 --session
-    state: LAUNCH, MAIN, ONGOING_LESSON
+    state: LAUNCH, MAIN//PASSIVE_LEARNING, ONGOING_LESSON
     transition_between_states
 
 

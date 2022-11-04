@@ -4,22 +4,28 @@ from threading import Thread
 import base64
 import time
 
+LOG_TAG = "HOLOLENS_CONNECTION"
 
-class HololensConnectionManager(object):
+
+class HololensConnectionManager():
     def __init__(self, show_stream):
         self.ip_address = CONSTANTS.HOLOLENS_IP_ADDRESS
         self.videoStream = VideoStream(show_stream, src=0)
+        print(LOG_TAG, "Connected to Hololens at: " + self.ip_address)
 
 
-class VideoStream(object):
+class VideoStream():
 
     def __init__(self, show_stream, src=0):
         url = CONSTANTS.HOLOLENS_URL + \
             '/api/holographic/stream/live_low.mp4?holo=false&pv=true&mic=true&loopback=true&vstab=false&vstabbuffer=0'
         # r = requests.get(url, stream=True)
+
+        # Using Hololens 2 camera
         #self.capture = cv2.VideoCapture(url)
 
-        # Test with laptop's internal camera
+        # Test with laptop's internal came
+        # ra
         self.capture = cv2.VideoCapture(0)
 
         #self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 300)

@@ -34,15 +34,16 @@ class norfair_yolo_detection(object):
             hit_counter_max=100
         )
 
-    def trackMultipleObjects(self, frame):
+    def trackMultipleObjects(self, frame, pointcloud, sensor="hololens"):
         # (status, frame) = capture.read()
         self.frame = frame
+        self.pointcloud = pointcloud
         yolo_detections = self.model(
             frame,
             conf_threshold=0.25,
             iou_threshold=0.45,
             image_size=480,
-            classes=[names.index("potted plant")]
+            #classes=[names.index("potted plant")]
             # classes=[32]
             # classes=[41]
         )
@@ -59,24 +60,41 @@ class norfair_yolo_detection(object):
             norfair.draw_boxes(self.frame, detections)
             norfair.draw_tracked_boxes(
                 self.frame, tracked_objects, draw_labels=True)
+        if sensor == "hololens":
+            returnString = []
+            for det in detections:
+                # print(det.points)
+                factor = 0.8
+                z_index = (500*500)/int((int(det.points[1][0]-det.points[0][0])) *
+                                        (int(det.points[1][1]-det.points[0][1])))
+                cv2.putText(self.frame, str(int(det.points[0][0]))+", "+str(int(det.points[0][1]))+", "+str(z_index), (50, 50),
+                            cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
 
-        returnString = []
-        for det in detections:
-            # print(det.points)
-            factor = 0.8
-            z_index = (500*500)/int((int(det.points[1][0]-det.points[0][0])) *
-                                    (int(det.points[1][1]-det.points[0][1])))
-            cv2.putText(self.frame, str(int(det.points[0][0]))+", "+str(int(det.points[0][1]))+", "+str(z_index), (50, 50),
-                        cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
-
-            returnString.append(
-                {"name": det.label, "x": ((det.points[0][0]/216)-1)*factor, "y": (1-(det.points[0][1]/120))*0.5})
+                returnString.append(
+                    {"name": det.label, "x": ((det.points[0][0]/216)-1)*factor, "y": (1-(det.points[0][1]/120))*0.5})
+        elif sensor == "zed":
+            returnString = []
+            for det in detections:
+                x1 = int(det.points[0][0])
+                x2 = int(det.points[1][0])
+                y1 = int(det.points[0][1])
+                y2 = int(det.points[1][1])
+                point3D = self.point_cloud.get_value((x1+x2)/2, (y1+y2)/2)
+            try:
+                round_off_param = 2
+                returnString.append(
+                    {"name": det.label, "x": -round(point3D[1][0] + CONSTANTS.DELTA_X, round_off_param), "y": -round(point3D[1][1] + CONSTANTS.DELTA_Y, round_off_param),  "z": -round(point3D[1][2] + CONSTANTS.DELTA_Z, round_off_param)})
+                # print(returnString[0]["x"], returnString[0]["y"],
+                # returnString[0]["z"], end="\r")
+            except:
+                returnString.append(
+                    {"name": "lost track"})
         cv2.imshow("Frame", self.frame)
         key = cv2.waitKey(1)
         if key == ord('q'):
             cv2.destroyAllWindows()
             exit(1)
-        print(returnString)
+        # print(returnString)
         return returnString
 
 
