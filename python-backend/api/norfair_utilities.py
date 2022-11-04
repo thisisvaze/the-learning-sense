@@ -6,6 +6,7 @@ import numpy as np
 import torch
 import torchvision.ops.boxes as bops
 import cv2
+import norfair
 from norfair import Detection, Paths, Tracker, Video
 from norfair.distances import frobenius, iou
 

@@ -4,8 +4,7 @@ import openai
 import json
 import requests
 import urllib.parse
-from api import multiple_object_detection
-import hololens.hololens_utilities
+from . import draw, multiple_object_detection
 OPENAI_API_KEY = "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"
 openai.api_key = OPENAI_API_KEY
 
@@ -26,9 +25,8 @@ def openai_text_output(query):
     return response.choices[0].text
 
 
-def fact_generator(topic):
-    data = multiple_object_detection.facebook_resnet_localize_objects(
-        hololens2_utilities.getPhoto())
+def fact_generator(topic, image):
+    data = multiple_object_detection.facebook_resnet_localize_objects(image)
     print(data)
     min_distance_x = 1
     min_distance_object_label = ""

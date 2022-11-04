@@ -1,4 +1,4 @@
-import api.norfaird_demo_3 as norfaird_demo_3
+import api.norfair_utilities as norfair_utilities
 import numpy as np
 
 
@@ -12,11 +12,11 @@ def draw(
     fix_paths,
 ):
     if track_points == "centroid":
-        norfaird_demo_3.draw_points(frame, detections)
-        norfaird_demo_3.draw_tracked_objects(frame, tracked_objects)
+        norfair_utilities.draw_points(frame, detections)
+        norfair_utilities.draw_tracked_objects(frame, tracked_objects)
     elif track_points == "bbox":
-        norfaird_demo_3.draw_boxes(frame, detections)
-        norfaird_demo_3.draw_tracked_boxes(frame, tracked_objects)
+        norfair_utilities.draw_boxes(frame, detections)
+        norfair_utilities.draw_tracked_boxes(frame, tracked_objects)
 
     if fix_paths:
         frame = paths_drawer.draw(

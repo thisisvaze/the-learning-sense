@@ -3,7 +3,7 @@ from typing import List, Optional, Union
 
 import numpy as np
 import torch
-from api.norfaird_demo_3 import Detection
+from api.norfair_utilities import Detection
 
 
 class YOLO:

@@ -16,7 +16,7 @@ import hololens2_utilities
 import visual_question_answering
 import generate_lesson
 import sentiment_analysis
-from api.norfaird_demo_3 import YOLO, yolo_detections_to_norfair_detections, names
+from api.norfair_utilities import YOLO, yolo_detections_to_norfair_detections, names
 from fastapi.responses import PlainTextResponse
 import os
 import asyncio
@@ -35,9 +35,9 @@ from typing import List, Optional, Union
 import numpy as np
 import torch
 import torchvision.ops.boxes as bops
-import api.norfaird_demo_3 as norfaird_demo_3
+import api.norfair_utilities as norfair_utilities
 import cv2
-from api.norfaird_demo_3 import Detection, Paths, Tracker, Video
+from api.norfair_utilities import Detection, Paths, Tracker, Video
 from norfair.distances import frobenius, iou
 import Constants.Values
 
@@ -105,12 +105,12 @@ class VideoStreamWidget(object):
         # detections[0]
         tracked_objects = self.tracker.update(detections=detections)
         if self.track_points == "centroid":
-            norfaird_demo_3.draw_points(self.frame, detections)
-            norfaird_demo_3.draw_tracked_objects(
+            norfair_utilities.draw_points(self.frame, detections)
+            norfair_utilities.draw_tracked_objects(
                 self.frame, tracked_objects, draw_labels=True)
         elif self.track_points == "bbox":
-            norfaird_demo_3.draw_boxes(self.frame, detections)
-            norfaird_demo_3.draw_tracked_boxes(
+            norfair_utilities.draw_boxes(self.frame, detections)
+            norfair_utilities.draw_tracked_boxes(
                 self.frame, tracked_objects, draw_labels=True)
 
         returnString = []
@@ -192,7 +192,7 @@ async def websocket_endpoint(websocket: WebSocket):
         #data = generate_lesson.initiate_curiousityAndSendToHeadset()
 
         # Generate Facts
-        #data = descriptive_answering.fact_generator(topic)
+        #data = descriptive_answering.fact_generator(topic, hololens2_utilites.getPhoto())
 
         # Track objects real time
         data = {"Items": video_stream_widget.trackMultipleObjects()}
