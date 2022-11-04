@@ -4,7 +4,7 @@ import openai
 import json
 import requests
 import urllib.parse
-import multiple_object_detection
+from api import multiple_object_detection
 import hololens.hololens_utilities
 OPENAI_API_KEY = "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"
 openai.api_key = OPENAI_API_KEY
