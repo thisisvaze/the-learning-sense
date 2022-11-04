@@ -1,4 +1,4 @@
-from hololens import hololens_connection, hololens_utilities
+from hololens import hololens_sensor_connection, hololens_utilities
 import Constants.Values as CONSTANTS
 from asyncio import constants
 from pickle import GLOBAL
@@ -32,22 +32,50 @@ import cv2
 from api.norfair_utilities import Detection, Paths, Tracker, Video
 from norfair.distances import frobenius, iou
 import Constants.Values
-from zed import zed_connection
+from zed import zed_sensor_connection
 import context_handler
 
 
-def main():
-    # hololens_connection_manager = hololens_connection.HololensConnectionManager(
-    #  show_stream=False)
-    zed_connection_manager = zed_connection.ZedConnectionManager(
-        show_stream=False)
-    context_handler_obj = context_handler.context(
-        sensor_connection_manager=zed_connection_manager)
+# Init hololens connection
+# hololens_connection_manager = hololens_sensor_connection.HololensConnectionManager(
+#  show_stream=False)
+# Init Zed Connection
+zed_connection_manager = zed_sensor_connection.ZedConnectionManager(
+    show_stream=False)
+context_handler_obj = context_handler.context(
+    sensor_connection_manager=zed_connection_manager)
 
+app = FastAPI()
+
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
     while True:
-        context_handler_obj.env_context.getData()
-        time.sleep(0.01)
+        # video_stream_widget.trackMultipleObjects()
+        # topic = await websocket.receive_text()
+        # print(data)
+        # match data:
+
+        #     case "context":
+        #         multipleObjectDetection(hololens2_utilities.getPhoto())
+        #         await asyncio.sleep(1)
+        #data = multipleObjectDetection(hololens2_utilities.getPhoto())
+
+        # showSurfaceAreaDummyLesson
+        #data = generate_lesson.initiate_curiousityAndSendToHeadset()
+
+        # Generate Facts
+        #data = descriptive_answering.fact_generator(topic, hololens2_utilites.getPhoto())
+        #data = "asda"
+        # Track objects real timeh
+        data = {"Items": context_handler_obj.env_context.getData()}
+        #data = returnCurrentImageFromCamera()
+        time.sleep(0.1)
+        #data = multipleObjectDetection(returnCurrentImageFromCamera())
+        #data = multipleObjectDetection(hololens2_utilities.getPhoto())
+        await websocket.send_text(f"{data}")
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

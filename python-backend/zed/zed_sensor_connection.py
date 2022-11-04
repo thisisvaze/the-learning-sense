@@ -131,8 +131,8 @@ class VideoStream():
 
         # Set configuration parameters
         input_type = sl.InputType()
-        if len(sys.argv) >= 2:
-            input_type.set_from_svo_file(sys.argv[1])
+        # if len(sys.argv) >= 2:
+        #     input_type.set_from_svo_file(sys.argv[1])
         init = sl.InitParameters(input_t=input_type)
         init.camera_resolution = sl.RESOLUTION.HD720
         init.depth_mode = sl.DEPTH_MODE.PERFORMANCE

@@ -34,7 +34,7 @@ class norfair_yolo_detection(object):
             hit_counter_max=100
         )
 
-    def trackMultipleObjects(self, frame, pointcloud, sensor="hololens"):
+    def trackMultipleObjects(self, frame, pointcloud, sensor):
         # (status, frame) = capture.read()
         self.frame = frame
         self.pointcloud = pointcloud
@@ -43,7 +43,7 @@ class norfair_yolo_detection(object):
             conf_threshold=0.25,
             iou_threshold=0.45,
             image_size=480,
-            #classes=[names.index("potted plant")]
+            classes=[names.index("cup")]
             # classes=[32]
             # classes=[41]
         )
@@ -94,7 +94,7 @@ class norfair_yolo_detection(object):
         if key == ord('q'):
             cv2.destroyAllWindows()
             exit(1)
-        # print(returnString)
+        print(returnString)
         return returnString
 
 

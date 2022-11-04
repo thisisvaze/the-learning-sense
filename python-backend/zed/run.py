@@ -15,7 +15,8 @@ mode_depth = 0
 point_cloud_format_ext = ".ply"
 depth_format_ext = ".png"
 
-def point_cloud_format_name(): 
+
+def point_cloud_format_name():
     global mode_point_cloud
     if mode_point_cloud > 3:
         mode_point_cloud = 0
@@ -25,9 +26,10 @@ def point_cloud_format_name():
         2: ".ply",
         3: ".vtk",
     }
-    return switcher.get(mode_point_cloud, "nothing") 
-  
-def depth_format_name(): 
+    return switcher.get(mode_point_cloud, "nothing")
+
+
+def depth_format_name():
     global mode_depth
     if mode_depth > 2:
         mode_depth = 0
@@ -36,29 +38,33 @@ def depth_format_name():
         1: ".pfm",
         2: ".pgm",
     }
-    return switcher.get(mode_depth, "nothing") 
+    return switcher.get(mode_depth, "nothing")
 
-def save_point_cloud(zed, filename) :
+
+def save_point_cloud(zed, filename):
     print("Saving Point Cloud...")
     tmp = sl.Mat()
     zed.retrieve_measure(tmp, sl.MEASURE.XYZRGBA)
-    saved = (tmp.write(filename + point_cloud_format_ext) == sl.ERROR_CODE.SUCCESS)
-    if saved :
+    saved = (tmp.write(filename + point_cloud_format_ext)
+             == sl.ERROR_CODE.SUCCESS)
+    if saved:
         print("Done")
-    else :
+    else:
         print("Failed... Please check that you have permissions to write on disk")
 
-def save_depth(zed, filename) :
+
+def save_depth(zed, filename):
     print("Saving Depth Map...")
     tmp = sl.Mat()
     zed.retrieve_measure(tmp, sl.MEASURE.DEPTH)
     saved = (tmp.write(filename + depth_format_ext) == sl.ERROR_CODE.SUCCESS)
-    if saved :
+    if saved:
         print("Done")
-    else :
+    else:
         print("Failed... Please check that you have permissions to write on disk")
 
-def save_sbs_image(zed, filename) :
+
+def save_sbs_image(zed, filename):
 
     image_sl_left = sl.Mat()
     zed.retrieve_image(image_sl_left, sl.VIEW.LEFT)
@@ -71,9 +77,9 @@ def save_sbs_image(zed, filename) :
     sbs_image = np.concatenate((image_cv_left, image_cv_right), axis=1)
 
     cv2.imwrite(filename, sbs_image)
-    
 
-def process_key_event(zed, key) :
+
+def process_key_event(zed, key):
     global mode_depth
     global mode_point_cloud
     global count_save
@@ -102,7 +108,8 @@ def process_key_event(zed, key) :
     else:
         a = 0
 
-def print_help() :
+
+def print_help():
     print(" Press 's' to save Side by side images")
     print(" Press 'p' to save Point Cloud")
     print(" Press 'd' to save Depth image")
@@ -110,15 +117,15 @@ def print_help() :
     print(" Press 'n' to switch Depth format")
 
 
-def main() :
+def main():
 
     # Create a ZED camera object
     zed = sl.Camera()
 
     # Set configuration parameters
     input_type = sl.InputType()
-    if len(sys.argv) >= 2 :
-        input_type.set_from_svo_file(sys.argv[1])
+    # if len(sys.argv) >= 2 :
+    #     input_type.set_from_svo_file(sys.argv[1])
     init = sl.InitParameters(input_t=input_type)
     init.camera_resolution = sl.RESOLUTION.HD1080
     init.depth_mode = sl.DEPTH_MODE.PERFORMANCE
@@ -126,7 +133,7 @@ def main() :
 
     # Open the camera
     err = zed.open(init)
-    if err != sl.ERROR_CODE.SUCCESS :
+    if err != sl.ERROR_CODE.SUCCESS:
         print(repr(err))
         zed.close()
         exit(1)
@@ -140,28 +147,31 @@ def main() :
 
     # Prepare new image size to retrieve half-resolution images
     image_size = zed.get_camera_information().camera_resolution
-    image_size.width = image_size.width /2
-    image_size.height = image_size.height /2
+    image_size.width = image_size.width / 2
+    image_size.height = image_size.height / 2
 
     # Declare your sl.Mat matrices
     image_zed = sl.Mat(image_size.width, image_size.height, sl.MAT_TYPE.U8_C4)
-    depth_image_zed = sl.Mat(image_size.width, image_size.height, sl.MAT_TYPE.U8_C4)
+    depth_image_zed = sl.Mat(
+        image_size.width, image_size.height, sl.MAT_TYPE.U8_C4)
     point_cloud = sl.Mat()
 
     key = ' '
-    while key != 113 :
+    while key != 113:
         err = zed.grab(runtime)
-        if err == sl.ERROR_CODE.SUCCESS :
+        if err == sl.ERROR_CODE.SUCCESS:
             # Retrieve the left image, depth image in the half-resolution
             zed.retrieve_image(image_zed, sl.VIEW.LEFT, sl.MEM.CPU, image_size)
-            zed.retrieve_image(depth_image_zed, sl.VIEW.DEPTH, sl.MEM.CPU, image_size)
+            zed.retrieve_image(depth_image_zed, sl.VIEW.DEPTH,
+                               sl.MEM.CPU, image_size)
             # Retrieve the RGBA point cloud in half resolution
-            zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA, sl.MEM.CPU, image_size)
+            zed.retrieve_measure(
+                point_cloud, sl.MEASURE.XYZRGBA, sl.MEM.CPU, image_size)
 
             # To recover data from sl.Mat to use it with opencv, use the get_data() method
             # It returns a numpy array that can be used as a matrix with opencv
             image_ocv = image_zed.get_data()
-            #print(depth_image_zed.get_data())
+            # print(depth_image_zed.get_data())
             depth_image_ocv = depth_image_zed.get_data()
             # x1 = 200
             # x2 = 600
@@ -175,7 +185,7 @@ def main() :
             #         y+=50
             #     x+=50
             # avg_depth = avg_depth/round(((x2-x1)/10)*((y2-y1)/10))
-            
+
             #print(avg_depth, end="\r")
 # Get and print distance value in mm at the center of the image
 # We measure the distance camera - object using Euclidean distance
@@ -183,9 +193,10 @@ def main() :
             y = round(image_zed.get_height() / 2)
             err, point_cloud_value = point_cloud.get_value(x, y)
             distance = math.sqrt(point_cloud_value[0] * point_cloud_value[0] +
-                                point_cloud_value[1] * point_cloud_value[1] +
-                                point_cloud_value[2] * point_cloud_value[2])
-            print("Distance to Camera at ({0}, {1}): {2} mm".format(x, y, distance), end="\r")
+                                 point_cloud_value[1] * point_cloud_value[1] +
+                                 point_cloud_value[2] * point_cloud_value[2])
+            print("Distance to Camera at ({0}, {1}): {2} mm".format(
+                x, y, distance), end="\r")
             # x = round(image_zed.get_width() / 2)
             # y = round(image_zed.get_height() / 2)
             # err, depth_value = depth_image_zed.get_value(x, y)
@@ -196,8 +207,8 @@ def main() :
             #x = point3D[0]
             #y = point3D[1]
             #z = point3D[2]
-            #color = point3D[3] 
-            #print(str(point3D)) 
+            #color = point3D[3]
+            # print(str(point3D))
             cv2.imshow("Image", image_ocv)
             cv2.imshow("Depth", depth_image_ocv)
 
@@ -209,6 +220,7 @@ def main() :
     zed.close()
 
     print("\nFINISH")
+
 
 if __name__ == "__main__":
     main()
