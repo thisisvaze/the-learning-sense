@@ -71,7 +71,7 @@ async def websocket_endpoint(websocket: WebSocket):
         # Track objects real timeh
         data = {"Items": context_handler_obj.env_context.getData()}
         #data = returnCurrentImageFromCamera()
-        time.sleep(0.1)
+        time.sleep(0.01)
         #data = multipleObjectDetection(returnCurrentImageFromCamera())
         #data = multipleObjectDetection(hololens2_utilities.getPhoto())
         await websocket.send_text(f"{data}")
