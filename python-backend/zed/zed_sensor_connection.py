@@ -135,8 +135,8 @@ class VideoStream():
         #     input_type.set_from_svo_file(sys.argv[1])
         init = sl.InitParameters(input_t=input_type)
         init.camera_resolution = sl.RESOLUTION.HD720
-        init.depth_mode = sl.DEPTH_MODE.PERFORMANCE
-        init.coordinate_units = sl.UNIT.MILLIMETER
+        #init.depth_mode = sl.DEPTH_MODE.PERFORMANCE
+        init.coordinate_units = sl.UNIT.METER
 
         # Open the camera
         err = self.zed.open(init)
@@ -183,8 +183,10 @@ class VideoStream():
                 # Retrieve the left image, depth image in the half-resolution
                 self.zed.retrieve_image(
                     self.image_zed, sl.VIEW.LEFT, sl.MEM.CPU, self.image_size)
-                self.zed.retrieve_image(self.depth_image_zed, sl.VIEW.DEPTH,
-                                        sl.MEM.CPU, self.image_size)
+
+                # self.zed.retrieve_image(self.depth_image_zed, sl.VIEW.DEPTH,
+                #                        sl.MEM.CPU, self.image_size)
+
                 # Retrieve the RGBA point cloud in half resolution
                 self.zed.retrieve_measure(
                     self.point_cloud, sl.MEASURE.XYZRGBA, sl.MEM.CPU, self.image_size)
@@ -219,4 +221,5 @@ class VideoStream():
             return jpg_as_text
 
     def get_current_point_cloud(self):
+        #print(self.point_cloud.get_value(300, 300))
         return self.point_cloud

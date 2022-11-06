@@ -35,7 +35,7 @@ import Constants.Values
 from zed import zed_sensor_connection
 import context_handler
 
-
+import requests
 # Init hololens connection
 # hololens_connection_manager = hololens_sensor_connection.HololensConnectionManager(
 #  show_stream=False)
@@ -69,13 +69,43 @@ async def websocket_endpoint(websocket: WebSocket):
         #data = descriptive_answering.fact_generator(topic, hololens2_utilites.getPhoto())
         #data = "asda"
         # Track objects real timeh
-        data = {"Items": context_handler_obj.env_context.getData()}
+        data = {"Items": context_handler_obj.env_context.getDefaultParameters()}
         #data = returnCurrentImageFromCamera()
         time.sleep(0.01)
         #data = multipleObjectDetection(returnCurrentImageFromCamera())
         #data = multipleObjectDetection(hololens2_utilities.getPhoto())
         await websocket.send_text(f"{data}")
 
-
 # if __name__ == "__main__":
 #     main()
+
+
+@app.post("/test")
+def sendDataToHololens():
+    context_handler_obj.env_context.getDefaultParameters()
+    context_handler_obj.env_context.getObjectCharacterstics(
+        color=True, material=False)
+
+
+async def getConcurrentMultipleResults(*args):
+    async with aiohttp.ClientSession() as session:
+        tasks = []
+        for arg in args:
+            tasks.append(arg[0](session, arg[1], arg[2]))
+        result = await asyncio.gather(*tasks)
+    await asyncio.gather()
+    return result
+
+
+@app.post("/testMultipleQueries")
+async def root(image: UploadFile):
+    base64_encoded_image = base64.b64encode(image.file.read()).decode('utf-8')
+    return {"data": await getConcurrentMultipleResults(
+        [visual_question_answering.getResultFromHuggingFace,
+            base64_encoded_image, "where is this?"],
+        [visual_question_answering.getResultFromHuggingFace,
+            base64_encoded_image, "what is the activity?"],
+        [visual_question_answering.getResultFromHuggingFace,
+            base64_encoded_image,  "how many people are there?"],
+        [visual_question_answering.getResultFromHuggingFace, base64_encoded_image, "what is the color of the cup"])
+    }
