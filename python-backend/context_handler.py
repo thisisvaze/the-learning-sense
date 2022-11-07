@@ -25,6 +25,7 @@ class context():
         self.sensor_connection_manager = sensor_connection_manager
         self.env_context = env_context(self.sensor_connection_manager)
         self.user_preferences = Preferences()
+        self.session.state = CONSTANTS.SESSION_STATE_EXPLORE
 
 
 class env_context():

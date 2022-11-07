@@ -34,7 +34,7 @@ from norfair.distances import frobenius, iou
 import Constants.Values
 from zed import zed_sensor_connection
 import context_handler
-
+import lesson_generator
 import requests
 
 # Init hololens connection
@@ -47,8 +47,53 @@ zed_connection_manager = zed_sensor_connection.ZedConnectionManager(
 context_handler_obj = context_handler.context(
     sensor_connection_manager=zed_connection_manager)
 
+
 app = FastAPI()
-socket_manager = SocketManager(app=app)
+sio = SocketManager(app=app)
+
+
+@app.sio.event
+def connect(sid, environ, auth):
+    print('connect ', sid)
+    context_handler_obj.session.state = CONSTANTS.SESSION_STATE_EXPLORE
+
+
+@app.sio.event
+def disconnect(sid):
+    print('disconnect ', sid)
+    context_handler_obj.session.state = CONSTANTS.SESSION_DISCONNECTED
+
+
+@app.post("/sendData")
+async def root():
+    while True:
+        if context_handler_obj.session.state == CONSTANTS.SESSION_STATE_EXPLORE:
+            await app.sio.emit(CONSTANTS.ENVIRONMENT_OJBECTS_UPDATE,
+                               {"Items": context_handler_obj.env_context.getDefaultParameters()})
+            time.sleep(0.01)
+
+        if context_handler_obj.session.state == CONSTANTS.SESSION_STATE_LAUNCH:
+            pass
+
+        if context_handler_obj.session.state == CONSTANTS.SESSION_STATE_ONGOING_LESSON:
+            await app.sio.emit(CONSTANTS.LESSON_INIT_INFO,
+                               {"Items": context_handler_obj.env_context.getDefaultParameters()})
+            time.sleep(0.01)
+
+        if context_handler_obj.session.state == CONSTANTS.SESSION_DISCONNECTED:
+            break
+
+
+@app.sio.on(CONSTANTS.INITIATE_LESSON_REQUEST)
+async def init_lesson():
+    await app.sio.emit(CONSTANTS.LESSON_INIT_INFO,
+                       {"Items": lesson_generator.sendLesson()})
+
+# @app.post("/sendData")
+# async def root():
+#     await app.sio.emit("env_update",
+#                        {"Items": context_handler_obj.env_context.getDefaultParameters()})
+
 
 # @app.websocket("/ws")
 # async def websocket_endpoint(websocket: WebSocket):
@@ -89,12 +134,12 @@ socket_manager = SocketManager(app=app)
 #     await app.sio.emit('lobby', 'User joined')
 
 
-@app.post("/sendData")
-def root():
-    app.sio.emit(
-        {"Items": context_handler_obj.env_context.getDefaultParameters()})
-
-
+# @app.sio.on('eventName')
+# def on_message(data):
+#     print('I received a message!', data)
+# @app.sio.event
+# def connect():
+#     print("Connected!!!")
 # async def getConcurrentMultipleResults(*args):
 #     async with aiohttp.ClientSession() as session:
 #         tasks = []
