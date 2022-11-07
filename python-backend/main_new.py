@@ -36,15 +36,18 @@ from zed import zed_sensor_connection
 import context_handler
 
 import requests
+
 # Init hololens connection
 # hololens_connection_manager = hololens_sensor_connection.HololensConnectionManager(
 #  show_stream=False)
+
 # Init Zed Connection
 zed_connection_manager = zed_sensor_connection.ZedConnectionManager(
     show_stream=False)
 context_handler_obj = context_handler.context(
     sensor_connection_manager=zed_connection_manager)
-
+global sendDataToHololensBoolean
+sendDataToHololensBoolean = False
 app = FastAPI()
 
 
@@ -52,11 +55,12 @@ app = FastAPI()
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     while True:
+        global sendDataToHololensBoolean
         # video_stream_widget.trackMultipleObjects()
         # topic = await websocket.receive_text()
         # print(data)
         # match data:
-
+        data = sendDataToHololens()
         #     case "context":
         #         multipleObjectDetection(hololens2_utilities.getPhoto())
         #         await asyncio.sleep(1)
@@ -69,43 +73,69 @@ async def websocket_endpoint(websocket: WebSocket):
         #data = descriptive_answering.fact_generator(topic, hololens2_utilites.getPhoto())
         #data = "asda"
         # Track objects real timeh
-        data = {"Items": context_handler_obj.env_context.getDefaultParameters()}
         #data = returnCurrentImageFromCamera()
+        print("data sent to hololens", str(data))
         time.sleep(0.01)
         #data = multipleObjectDetection(returnCurrentImageFromCamera())
         #data = multipleObjectDetection(hololens2_utilities.getPhoto())
+
         await websocket.send_text(f"{data}")
+        sendDataToHololensBoolean = False
 
 # if __name__ == "__main__":
 #     main()
 
 
+@app.post("/sendData")
+def root():
+    global sendDataToHololensBoolean
+    sendDataToHololensBoolean = True
+    return "data sent to hololens"
+
+
+def dataNeedsToBeSent():
+    global sendDataToHololensBoolean
+    return sendDataToHololensBoolean
+
+
 @app.post("/test")
 def sendDataToHololens():
-    context_handler_obj.env_context.getDefaultParameters()
-    context_handler_obj.env_context.getObjectCharacterstics(
-        color=True, material=False)
+    while True:
+        if dataNeedsToBeSent():
+            break
+    return {"Items": context_handler_obj.env_context.getDefaultParameters()}
 
 
-async def getConcurrentMultipleResults(*args):
-    async with aiohttp.ClientSession() as session:
-        tasks = []
-        for arg in args:
-            tasks.append(arg[0](session, arg[1], arg[2]))
-        result = await asyncio.gather(*tasks)
-    await asyncio.gather()
-    return result
+# async def getConcurrentMultipleResults(*args):
+#     async with aiohttp.ClientSession() as session:
+#         tasks = []
+#         for arg in args:
+#             tasks.append(arg[0](session, arg[1], arg[2]))
+#         result = await asyncio.gather(*tasks)
+#     await asyncio.gather()
+#     return result
 
 
-@app.post("/testMultipleQueries")
-async def root(image: UploadFile):
-    base64_encoded_image = base64.b64encode(image.file.read()).decode('utf-8')
-    return {"data": await getConcurrentMultipleResults(
-        [visual_question_answering.getResultFromHuggingFace,
-            base64_encoded_image, "where is this?"],
-        [visual_question_answering.getResultFromHuggingFace,
-            base64_encoded_image, "what is the activity?"],
-        [visual_question_answering.getResultFromHuggingFace,
-            base64_encoded_image,  "how many people are there?"],
-        [visual_question_answering.getResultFromHuggingFace, base64_encoded_image, "what is the color of the cup"])
-    }
+# @app.post("/testMultipleQueries")
+# async def root(image: UploadFile):
+#     base64_encoded_image = base64.b64encode(image.file.read()).decode('utf-8')
+#     return {"data": await getConcurrentMultipleResults(
+#         [visual_question_answering.getResultFromHuggingFace,
+#             base64_encoded_image, "where is this?"],
+#         [visual_question_answering.getResultFromHuggingFace,
+#             base64_encoded_image, "what is the activity?"],
+#         [visual_question_answering.getResultFromHuggingFace,
+#             base64_encoded_image,  "how many people are there?"],
+#         [visual_question_answering.getResultFromHuggingFace,
+#             base64_encoded_image, "what is the color of the cup"],
+#         [visual_question_answering.getResultFromHuggingFace,
+#             base64_encoded_image, "where is this?"],
+#         [visual_question_answering.getResultFromHuggingFace,
+#             base64_encoded_image, "what is the activity?"],
+#         [visual_question_answering.getResultFromHuggingFace,
+#             base64_encoded_image,  "how many people are there?"],
+#         [visual_question_answering.getResultFromHuggingFace,
+#             base64_encoded_image, "what is the color of the cup"]
+
+#     )
+#     }

@@ -1,7 +1,9 @@
+--DONE
 -- env_context
     List of Objects:
         Default Parameters: location (x,y)
         Special Parameters: (user_preferences.subject -> query_characterstic) [eg. science -> material, math -> shape, language -> color, shape]
+
 
 -- user_preferences JSON    
     subject
