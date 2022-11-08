@@ -3,7 +3,7 @@ from UserPreferences import Preferences
 import api.norfair_utilities as norfair_utilities
 import cv2
 from api.norfair_utilities import Detection, Paths, Tracker, Video
-
+import asyncio
 from norfair.distances import frobenius, iou
 from api import multiple_object_detection
 import api.visual_question_answering as vqa
@@ -14,9 +14,22 @@ import base64
 class session():
     def __init__(self, state=CONSTANTS.SESSION_STATE_LAUNCH):
         self.state = state
+        self._observers = []
 
-    def transition_to_state(self, session_state):
-        self.state = session_state
+    # @property
+    # def state(self):
+    #     return self._state
+
+    # @state.setter
+    # async def state(self, value):
+    #     self._state = value
+    #     for callback in self._observers:
+    #         print('announcing change')
+    #         await callback(self._state)
+
+    # def bind_to(self, callback):
+    #     print('bound')
+    #     self._observers.append(callback)
 
 
 class context():

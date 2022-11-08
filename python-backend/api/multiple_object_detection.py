@@ -41,7 +41,7 @@ class norfair_yolo_detection(object):
             conf_threshold=0.25,
             iou_threshold=0.45,
             image_size=480,
-            classes=[names.index("cup")]
+            # classes=[names.index("cup")]
             # classes=[32]
             # classes=[41]
         )
@@ -79,10 +79,10 @@ class norfair_yolo_detection(object):
                     y1 = int(det.points[0][1])
                     y2 = int(det.points[1][1])
                     point3D = pointcloud.get_value((x1+x2)/2, (y1+y2)/2)
-                    print(point3D)
-                round_off_param = 2
-                returnString.append(
-                    {"name": det.label, "x": -round(point3D[1][0] + CONSTANTS.DELTA_X, round_off_param), "y": -round(point3D[1][1] + CONSTANTS.DELTA_Y, round_off_param),  "z": -round(point3D[1][2] + CONSTANTS.DELTA_Z, round_off_param)})
+                    # print(point3D)
+                    round_off_param = 2
+                    returnString.append(
+                        {"name": det.label, "x": -round(point3D[1][0] + CONSTANTS.DELTA_X, round_off_param), "y": -round(point3D[1][1] + CONSTANTS.DELTA_Y, round_off_param),  "z": -round(point3D[1][2] + CONSTANTS.DELTA_Z, round_off_param)})
             except:
                 returnString.append(
                     {"name": "lost track"})
@@ -91,7 +91,7 @@ class norfair_yolo_detection(object):
         if key == ord('q'):
             cv2.destroyAllWindows()
             exit(1)
-        print(returnString)
+        # print(returnString)
         return returnString
 
 

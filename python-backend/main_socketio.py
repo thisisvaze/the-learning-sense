@@ -37,57 +37,100 @@ import context_handler
 import lesson_generator
 import requests
 
+
 # Init hololens connection
 # hololens_connection_manager = hololens_sensor_connection.HololensConnectionManager(
 #  show_stream=False)
 
 # Init Zed Connection
+# connection manager
 zed_connection_manager = zed_sensor_connection.ZedConnectionManager(
     show_stream=False)
+
 context_handler_obj = context_handler.context(
     sensor_connection_manager=zed_connection_manager)
-
 
 app = FastAPI()
 sio = SocketManager(app=app)
 
 
+async def env_info_update():
+    while True:
+        data = {"Items": context_handler_obj.env_context.getDefaultParameters()}
+        # print(data)
+        await app.sio.emit(CONSTANTS.ENVIRONMENT_OJBECTS_UPDATE, data)
+        await asyncio.sleep(3)
+
+
+async def manageCommunicationWithDevice():
+    session_state = context_handler_obj.session.state
+    print("Session state changed to :" + session_state)
+    if session_state == CONSTANTS.SESSION_STATE_EXPLORE:
+        app.sio.start_background_task(target=env_info_update)
+
+    if session_state == CONSTANTS.SESSION_STATE_INITIATING_LESSON:
+        await app.sio.emit(CONSTANTS.LESSON_INIT_INFO,
+                            {"Items": lesson_generator.sendLesson()})
+
+    if session_state == CONSTANTS.SESSION_STATE_LAUNCH:
+        await asyncio.sleep(0.1)
+
+    if session_state == CONSTANTS.SESSION_STATE_LESSON_INITIATED:
+        await asyncio.sleep(0.1)
+
+    if session_state == CONSTANTS.SESSION_STATE_DISCONNECTED:
+        await asyncio.sleep(0.1)
+
+
 @app.sio.event
-def connect(sid, environ, auth):
+async def connect(sid, environ, auth):
     print('connect ', sid)
     context_handler_obj.session.state = CONSTANTS.SESSION_STATE_EXPLORE
+    await manageCommunicationWithDevice()
 
 
 @app.sio.event
-def disconnect(sid):
+async def disconnect(sid):
     print('disconnect ', sid)
-    context_handler_obj.session.state = CONSTANTS.SESSION_DISCONNECTED
-
-
-@app.post("/sendData")
-async def root():
-    while True:
-        if context_handler_obj.session.state == CONSTANTS.SESSION_STATE_EXPLORE:
-            await app.sio.emit(CONSTANTS.ENVIRONMENT_OJBECTS_UPDATE,
-                               {"Items": context_handler_obj.env_context.getDefaultParameters()})
-            time.sleep(0.01)
-
-        if context_handler_obj.session.state == CONSTANTS.SESSION_STATE_LAUNCH:
-            pass
-
-        if context_handler_obj.session.state == CONSTANTS.SESSION_STATE_ONGOING_LESSON:
-            await app.sio.emit(CONSTANTS.LESSON_INIT_INFO,
-                               {"Items": context_handler_obj.env_context.getDefaultParameters()})
-            time.sleep(0.01)
-
-        if context_handler_obj.session.state == CONSTANTS.SESSION_DISCONNECTED:
-            break
+    context_handler_obj.session.state = CONSTANTS.SESSION_STATE_DISCONNECTED
+    await manageCommunicationWithDevice()
 
 
 @app.sio.on(CONSTANTS.INITIATE_LESSON_REQUEST)
-async def init_lesson():
-    await app.sio.emit(CONSTANTS.LESSON_INIT_INFO,
-                       {"Items": lesson_generator.sendLesson()})
+async def root():
+    context_handler_obj.session.state = CONSTANTS.SESSION_STATE_INITIATING_LESSON
+    await manageCommunicationWithDevice()
+
+
+@app.sio.on(CONSTANTS.SPEECH_SENTENCE_SPOKEN)
+async def root(sid, data):
+    print(data)
+
+
+@app.sio.on(CONSTANTS.SESSION_STATE_INITIATING_LESSON)
+async def root():
+    context_handler_obj.session.state = CONSTANTS.SESSION_STATE_INITIATING_LESSON
+
+# @app.post("/sendData")
+# async def root():
+#     while True:
+#         if context_handler_obj.session.state == CONSTANTS.SESSION_STATE_EXPLORE:
+#             data = {"Items": context_handler_obj.env_context.getDefaultParameters()}
+#             print(data)
+#             await app.sio.emit(CONSTANTS.ENVIRONMENT_OJBECTS_UPDATE, data)
+#             time.sleep(1)
+
+#         if context_handler_obj.session.state == CONSTANTS.SESSION_STATE_LAUNCH:
+#             pass
+
+#         if context_handler_obj.session.state == CONSTANTS.SESSION_STATE_ONGOING_LESSON:
+#             await app.sio.emit(CONSTANTS.LESSON_INIT_INFO,
+#                                {"Items": context_handler_obj.env_context.getDefaultParameters()})
+#             time.sleep(0.1)
+
+#         if context_handler_obj.session.state == CONSTANTS.SESSION_DISCONNECTED:
+#             break
+
 
 # @app.post("/sendData")
 # async def root():
