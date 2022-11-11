@@ -93,8 +93,6 @@ public class SocketConnectionClient : MonoBehaviour
         socket.OnDisconnected += (sender, e) =>
         {
             Debug.Log("Socket disconnected with Server " + e);
-            Debug.Log("Trying to reconnect...");
-            socket.Connect();
         };
         socket.OnReconnectAttempt += (sender, e) =>
         {
@@ -150,17 +148,25 @@ public class SocketConnectionClient : MonoBehaviour
     {
         //markers[0] = (Instantiate(labelType, Camera.main.transform.position, Camera.main.transform.rotation) as GameObject);
         EventManager.StartListening(Constants.SPEECH_SENTENCE_SPOKEN, OnSentenceSpoken);
+        EventManager.StartListening(Constants.BUTTON_PRESSED, OnInputRecieved);
     }
 
     void OnDisable()
     {
         EventManager.StopListening(Constants.SPEECH_SENTENCE_SPOKEN, OnSentenceSpoken);
+        EventManager.StopListening(Constants.BUTTON_PRESSED, OnInputRecieved);
     }
 
     private async void OnSentenceSpoken(string message)
     {
         Debug.Log(LOG + " Sending  " + message + "to server");
         await socket.EmitAsync(Constants.SPEECH_SENTENCE_SPOKEN, message);
+    }
+
+    private async void OnInputRecieved(string message)
+    {
+        Debug.Log(LOG + " Sending  " + message + "to server");
+        await socket.EmitAsync(Constants.BUTTON_PRESSED, message);
     }
 
     private void OnApplicationQuit()

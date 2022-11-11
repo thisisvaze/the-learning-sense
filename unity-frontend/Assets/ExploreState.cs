@@ -16,6 +16,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography;
 using System.Runtime.InteropServices;
 using Microsoft.MixedReality.Toolkit;
+using Microsoft.MixedReality.Toolkit.UX;
 using Microsoft.MixedReality.Toolkit.Subsystems;
 using Microsoft.MixedReality.Toolkit.SpatialManipulation;
 using Microsoft.MixedReality.Toolkit.Input;
@@ -24,10 +25,14 @@ using UnityEngine.UI;
 using NativeWebSocket;
 using System.Threading;
 using System.Threading.Tasks;
+using UnityEngine.XR.Interaction.Toolkit;
+
 public class ExploreState : MonoBehaviour
 {
     public float delta_x = 0, delta_y = 0, delta_z = 0;
     public GameObject labelType;
+
+    public PressableButton button;
     public GameObject[] markers = new GameObject[20];
 
     // Start is called before the first frame update
@@ -37,11 +42,22 @@ public class ExploreState : MonoBehaviour
         for (int i = 0; i < 20; i++)
         {
             markers[i] = (Instantiate(labelType, Camera.main.transform.position, Camera.main.transform.rotation) as GameObject);
+            markers[i].AddComponent<PressableButton>();
             markers[i].transform.parent = gameObject.transform;
+            markers[i].GetComponentInChildren<PressableButton>().selectEntered.AddListener(OnButtonEnabled);
         }
+
+        //markers[0].OnClicked()
 
 
     }
+
+    private void OnButtonEnabled(SelectEnterEventArgs arg0)
+    {
+        Debug.Log("Button Clicked" + arg0.ToString());
+        EventManager.TriggerEvent(Constants.BUTTON_PRESSED, arg0.ToString());
+    }
+
 
     void OnEnable()
     {
@@ -86,17 +102,13 @@ public class ExploreState : MonoBehaviour
                 //Debug.Log("Object seen: "+envInfo.name);
                 Vector3 finalPosition = new Vector3(0, 0, 0);
 
-                try
-                {
-                    finalPosition =
+                finalPosition =
                                     new Vector3((float.Parse(envInfo.x)), (float.Parse(envInfo.y)), (float.Parse(envInfo.z)));
-                }
-                catch
-                {
-                    // Vector3 forwardPosition = Camera.main.transform.rotation * Vector3.forward;
-                    // finalPosition = Camera.main.transform.position + 0.8f * forwardPosition +
-                    //             new Vector3((float.Parse(envInfo.x)), (float.Parse(envInfo.y)), (float.Parse(envInfo.z)));
-                }
+
+                // Vector3 forwardPosition = Camera.main.transform.rotation * Vector3.forward;
+                // finalPosition = Camera.main.transform.position + 0.8f * forwardPosition +
+                //             new Vector3((float.Parse(envInfo.x)), (float.Parse(envInfo.y)), (float.Parse(envInfo.z)));
+
 
                 //Camera.main.transform.position + 0.8f*forwardPosition + new Vector3((float.Parse(labelInfo.x)) , (float.Parse(labelInfo.y)) , 0);
                 //Debug.Log("here: "+ finalPosition);
@@ -105,7 +117,7 @@ public class ExploreState : MonoBehaviour
                 Debug.Log("here: " + finalPosition);
                 Debug.Log("Text:" + gameObject.transform.position);
                 Debug.Log("Text:" + gameObject.GetComponentInChildren<TMP_Text>().text);
-                markers[i].transform.localPosition = finalPosition;
+                markers[i].transform.position = finalPosition;
                 markers[i].transform.rotation = Camera.main.transform.rotation;
                 markers[i].GetComponentInChildren<TMP_Text>().text = envInfo.name;
 

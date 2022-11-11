@@ -378,6 +378,7 @@ MonoBehaviour:
   delta_y: 0
   delta_z: 0
   labelType: {fileID: 5691419709616440555, guid: 3e816bc244e720a44bdea29af72e0b8b, type: 3}
+  button: {fileID: 0}
   markers:
   - {fileID: 0}
   - {fileID: 0}
@@ -421,7 +422,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 130693946}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 44c3f7067740ddf44a58ecc9e6caf9e2, type: 3}
   m_Name: 

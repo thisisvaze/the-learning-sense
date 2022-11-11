@@ -133,7 +133,7 @@ class VideoStream():
         # if len(sys.argv) >= 2:
         #     input_type.set_from_svo_file(sys.argv[1])
         init = sl.InitParameters()
-        init.camera_resolution = sl.RESOLUTION.VGA
+        init.camera_resolution = sl.RESOLUTION.HD720
         init.depth_mode = sl.DEPTH_MODE.PERFORMANCE
         init.coordinate_units = sl.UNIT.METER
         init.depth_stabilization = False
@@ -154,12 +154,8 @@ class VideoStream():
 
         # Prepare new image size to retrieve half-resolution images
         self.image_size = self.zed.get_camera_information().camera_resolution
-        self.image_size.width = self.image_size.width / 3
-        self.image_size.height = self.image_size.height / 3
-
-        self.res = sl.Resolution()
-        self.res.width = 720
-        self.res.height = 404
+        self.image_size.width = self.image_size.width / 2
+        self.image_size.height = self.image_size.height / 2
         # Declare your sl.Mat matrices
         self.image_zed = sl.Mat(
             self.image_size.width, self.image_size.height, sl.MAT_TYPE.U8_C4)
@@ -184,8 +180,8 @@ class VideoStream():
                 self.zed.retrieve_image(
                     self.image_zed, sl.VIEW.LEFT, sl.MEM.CPU, self.image_size)
                 self.zed.retrieve_measure(
-                    self.point_cloud, sl.MEASURE.XYZRGBA, sl.MEM.GPU, self.image_size)
-                time.sleep(2)
+                    self.point_cloud, sl.MEASURE.XYZRGBA, sl.MEM.CPU, self.image_size)
+                time.sleep(0.5)
 
     def get_current_frame(self, mode="opencv"):
         if mode == "opencv":

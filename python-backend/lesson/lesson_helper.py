@@ -10,6 +10,10 @@ def initiate_curiousityAndSendToHeadset():
         lesson_object = json.load(lesson_content)
         return json.dumps(lesson_object)
 
+def handle_message(message):
+    wit_response_message = json.loads(message)
+    print(wit_response_message)
+
 # # def choose_lesson():
 # #     with open("sample_context.json") as json_file:
 # #         baseContext = json.load(json_file)

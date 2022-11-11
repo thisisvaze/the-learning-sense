@@ -34,7 +34,7 @@ from norfair.distances import frobenius, iou
 import Constants.Values
 from zed import zed_sensor_connection
 import context_handler
-import lesson_generator
+from lesson import lesson_helper
 import requests
 from api import message_extraction
 
@@ -60,7 +60,7 @@ async def env_info_update():
         data = {"Items": context_handler_obj.env_context.getDefaultParameters()}
         # print(data)
         await app.sio.emit(CONSTANTS.ENVIRONMENT_OJBECTS_UPDATE, data)
-        await asyncio.sleep(5)
+        await asyncio.sleep(2)
         if context_handler_obj.session.state != CONSTANTS.SESSION_STATE_EXPLORE:
             break
 
@@ -73,12 +73,13 @@ async def manageCommunicationWithDevice():
 
     if session_state == CONSTANTS.SESSION_STATE_INITIATING_LESSON:
         await app.sio.emit(CONSTANTS.LESSON_INIT_INFO,
-                           {"Items": lesson_generator.sendLesson()})
+                           {"Items": lesson_helper.sendLesson()})
 
     if session_state == CONSTANTS.SESSION_STATE_LAUNCH:
         await asyncio.sleep(0.1)
 
     if session_state == CONSTANTS.SESSION_STATE_LESSON_INITIATED:
+
         await asyncio.sleep(0.1)
 
     if session_state == CONSTANTS.SESSION_STATE_DISCONNECTED:
@@ -107,8 +108,14 @@ async def root():
 
 @app.sio.on(CONSTANTS.SPEECH_SENTENCE_SPOKEN)
 async def root(sid, data):
-    # print(str(wit.infer_message(data)))
-    pass
+    if context_handler_obj.session.state == CONSTANTS.SESSION_STATE_LESSON_INITIATED:
+        lesson_helper.handle_message(str(wit.infer_message(data)))
+
+
+@app.sio.on(CONSTANTS.BUTTON_PRESSED)
+async def root(sid, data):
+    print(data)
+
 
 # @app.post("/sendData")
 # async def root():

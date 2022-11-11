@@ -16,6 +16,8 @@ public class Constants : MonoBehaviour
     public static string INITIATE_LESSON_REQUEST = "INITIATE_LESSON_REQUEST";
     public static string LESSON_INIT_INFO = "LESSON_INIT_INFO";
     public static string SPEECH_SENTENCE_SPOKEN = "SPEECH_SENTENCE_SPOKEN";
+
+    public static string BUTTON_PRESSED = "BUTTON_PRESSED";
     // Start is called before the first frame update
     void Start()
     {
