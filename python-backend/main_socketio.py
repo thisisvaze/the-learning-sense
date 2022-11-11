@@ -32,23 +32,22 @@ import cv2
 from api.norfair_utilities import Detection, Paths, Tracker, Video
 from norfair.distances import frobenius, iou
 import Constants.Values
-#from zed import zed_sensor_connection
+from zed import zed_sensor_connection
 import context_handler
 import lesson_generator
 import requests
 from api import message_extraction
 
 # Init hololens connection
-hololens_connection_manager = hololens_sensor_connection.HololensConnectionManager(
-    show_stream=False)
-
-# Init Zed Connection
-# connection manager
-# zed_connection_manager = zed_sensor_connection.ZedConnectionManager(
+# connection_manager = hololens_sensor_connection.HololensConnectionManager(
 #     show_stream=False)
 
+# Init Zed connection
+connection_manager = zed_sensor_connection.ZedConnectionManager(
+    show_stream=False)
+
 context_handler_obj = context_handler.context(
-    sensor_connection_manager=hololens_connection_manager)
+    sensor_connection_manager=connection_manager)
 
 
 app = FastAPI()
@@ -61,7 +60,7 @@ async def env_info_update():
         data = {"Items": context_handler_obj.env_context.getDefaultParameters()}
         # print(data)
         await app.sio.emit(CONSTANTS.ENVIRONMENT_OJBECTS_UPDATE, data)
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(5)
         if context_handler_obj.session.state != CONSTANTS.SESSION_STATE_EXPLORE:
             break
 
@@ -108,7 +107,8 @@ async def root():
 
 @app.sio.on(CONSTANTS.SPEECH_SENTENCE_SPOKEN)
 async def root(sid, data):
-    print(str(wit.infer_message(data)))
+    # print(str(wit.infer_message(data)))
+    pass
 
 # @app.post("/sendData")
 # async def root():

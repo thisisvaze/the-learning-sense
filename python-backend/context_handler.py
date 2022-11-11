@@ -55,15 +55,16 @@ class env_context():
         return self.getObjectCharactersics(self, color, material)
 
     def getCoordinatesOfObjectsInEnvironment(self):
+        # return self.obj_detection_manager.trackMultipleObjects(
+        #     frame=self.sensor_connection_manager.videoStream.get_current_frame(),
+        #     sensor="hololens",
+        #     pointcloud=None
+        # )
         return self.obj_detection_manager.trackMultipleObjects(
             frame=self.sensor_connection_manager.videoStream.get_current_frame(),
-            sensor="hololens",
-            pointcloud=None
-        )
-        return self.obj_detection_manager.trackMultipleObjects(
-            frame=self.sensor_connection_manager.videoStream.get_current_frame(),
-            sensor="hololens",
+            sensor=self.sensor_connection_manager.deviceType,
             pointcloud=self.sensor_connection_manager.videoStream.get_current_point_cloud()
+            # ,depth = self.sensor_connection_manager.videoStream.depth_image_zed
 
         )
 

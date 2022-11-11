@@ -14,8 +14,8 @@ from norfair.distances import frobenius, iou
 import Constants
 from threading import Thread
 import time
-
-LOG_TAG = "HOLOLENS_CONNECTION"
+import asyncio
+LOG_TAG = "ZED_CONNECTION"
 help_string = "[s] Save side by side image [d] Save Depth, [n] Change Depth format, [p] Save Point Cloud, [m] Change Point Cloud format, [q] Quit"
 prefix_point_cloud = "Cloud_"
 prefix_depth = "Depth_"
@@ -118,7 +118,7 @@ def print_help():
 
 class ZedConnectionManager():
     def __init__(self, show_stream):
-
+        self.deviceType = "zed"
         self.videoStream = VideoStream(show_stream, src=0)
 
 
@@ -130,13 +130,13 @@ class VideoStream():
         self.zed = sl.Camera()
 
         # Set configuration parameters
-        input_type = sl.InputType()
         # if len(sys.argv) >= 2:
         #     input_type.set_from_svo_file(sys.argv[1])
-        init = sl.InitParameters(input_t=input_type)
-        init.camera_resolution = sl.RESOLUTION.HD720
-        #init.depth_mode = sl.DEPTH_MODE.PERFORMANCE
+        init = sl.InitParameters()
+        init.camera_resolution = sl.RESOLUTION.VGA
+        init.depth_mode = sl.DEPTH_MODE.PERFORMANCE
         init.coordinate_units = sl.UNIT.METER
+        init.depth_stabilization = False
 
         # Open the camera
         err = self.zed.open(init)
@@ -146,7 +146,7 @@ class VideoStream():
             exit(1)
 
         # Display help in console
-        print_help()
+        # print_help()
 
         # Set runtime parameters after opening the camera
         self.runtime = sl.RuntimeParameters()
@@ -154,26 +154,26 @@ class VideoStream():
 
         # Prepare new image size to retrieve half-resolution images
         self.image_size = self.zed.get_camera_information().camera_resolution
-        self.image_size.width = self.image_size.width / 2
-        self.image_size.height = self.image_size.height / 2
+        self.image_size.width = self.image_size.width / 3
+        self.image_size.height = self.image_size.height / 3
 
+        self.res = sl.Resolution()
+        self.res.width = 720
+        self.res.height = 404
         # Declare your sl.Mat matrices
         self.image_zed = sl.Mat(
             self.image_size.width, self.image_size.height, sl.MAT_TYPE.U8_C4)
-        self.depth_image_zed = sl.Mat(
-            self.image_size.width, self.image_size.height, sl.MAT_TYPE.U8_C4)
-        self.point_cloud = sl.Mat()
+        # self.depth_image_zed = sl.Mat(
+        #     self.image_size.width, self.image_size.height, sl.MAT_TYPE.U8_C4)
+        self.point_cloud = sl.Mat(
+            self.image_size.width, self.image_size.height, sl.MAT_TYPE.F32_C4)
 
+        self.frame = self.image_zed.get_data()
+        # asyncio.get_event_loop().create_task(self.update())
        # Start the thread to read frames from the video stream
         self.thread = Thread(target=self.update, args=())
         self.thread.daemon = True
         self.thread.start()
-        if (show_stream):
-            while True:
-                if self.capture.isOpened():
-                    self.frame = self.image_zed.get_data()
-                    self.show_stream()
-                    break
 
     def update(self):
         # Read the next frame from the stream in a different thread
@@ -183,43 +183,32 @@ class VideoStream():
                 # Retrieve the left image, depth image in the half-resolution
                 self.zed.retrieve_image(
                     self.image_zed, sl.VIEW.LEFT, sl.MEM.CPU, self.image_size)
-
-                # self.zed.retrieve_image(self.depth_image_zed, sl.VIEW.DEPTH,
-                #                        sl.MEM.CPU, self.image_size)
-
-                # Retrieve the RGBA point cloud in half resolution
                 self.zed.retrieve_measure(
-                    self.point_cloud, sl.MEASURE.XYZRGBA, sl.MEM.CPU, self.image_size)
-                self.frame = self.image_zed.get_data()
-                time.sleep(.01)
+                    self.point_cloud, sl.MEASURE.XYZRGBA, sl.MEM.GPU, self.image_size)
+                time.sleep(2)
+
+    def get_current_frame(self, mode="opencv"):
+        if mode == "opencv":
+            return self.image_zed.get_data()
+        elif mode == "base64":
+            retval, buffer = cv2.imencode('.jpg', self.image_zed.get_data())
+            jpg_as_text = base64.b64encode(buffer)
+            print(jpg_as_text[:80])
+            return jpg_as_text
+
+    def get_current_point_cloud(self):
+        # return None
+        return self.point_cloud
 
     def show_frame(self):
         image_ocv = self.image_zed.get_data()
         # print(depth_image_zed.get_data())
-        depth_image_ocv = self.depth_image_zed.get_data()
+        #depth_image_ocv = self.depth_image_zed.get_data()
         cv2.imshow("Image", image_ocv)
-        cv2.imshow("Depth", depth_image_ocv)
+        #cv2.imshow("Depth", depth_image_ocv)
         key = cv2.waitKey(1)
         # process_key_event(key)
         if key == ord('q'):
             cv2.destroyAllWindows()
             self.zed.close()
             exit(1)
-
-    def show_stream(self):
-        while True:
-            if self.capture.isOpened():
-                self.show_frame()
-
-    def get_current_frame(self, mode="opencv"):
-        if mode == "opencv":
-            return self.frame
-        elif mode == "base64":
-            retval, buffer = cv2.imencode('.jpg', self.frame)
-            jpg_as_text = base64.b64encode(buffer)
-            print(jpg_as_text[:80])
-            return jpg_as_text
-
-    def get_current_point_cloud(self):
-        #print(self.point_cloud.get_value(300, 300))
-        return self.point_cloud

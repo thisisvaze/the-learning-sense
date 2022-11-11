@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Constants : MonoBehaviour
 {
-    public static string SOCKET_URL = "http://192.168.0.13:8000";
+    public static string SOCKET_URL = "http://192.168.0.117:8000";
     public static string ENVIRONMENT_OJBECTS_UPDATE = "ENVIRONMENT_OJBECTS_UPDATE";
     public static string SESSION_STATE_LAUNCH = "SESSION_STATE_LAUNCH";
     public static string SESSION_STATE_EXPLORE = "SESSION_STATE_EXPLORE";

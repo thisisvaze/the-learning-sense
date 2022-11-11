@@ -9,6 +9,7 @@ LOG_TAG = "HOLOLENS_CONNECTION"
 
 class HololensConnectionManager():
     def __init__(self, show_stream):
+        self.deviceType = "hololens"
         self.ip_address = CONSTANTS.HOLOLENS_IP_ADDRESS
         self.videoStream = VideoStream(show_stream, src=0)
         print(LOG_TAG, "Connected to Hololens at: " + self.ip_address)
@@ -74,3 +75,6 @@ class VideoStream():
             jpg_as_text = base64.b64encode(buffer)
             print(jpg_as_text[:80])
             return jpg_as_text
+
+    def get_current_point_cloud(self):
+        return None

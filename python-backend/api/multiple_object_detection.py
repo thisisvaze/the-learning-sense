@@ -82,11 +82,28 @@ class norfair_yolo_detection(object):
                     point3D = pointcloud.get_value((x1+x2)/2, (y1+y2)/2)
                     # print(point3D)
                     round_off_param = 2
+                    #returnString.append({"name": det.label})
                     returnString.append(
                         {"name": det.label, "x": -round(point3D[1][0] + CONSTANTS.DELTA_X, round_off_param), "y": -round(point3D[1][1] + CONSTANTS.DELTA_Y, round_off_param),  "z": -round(point3D[1][2] + CONSTANTS.DELTA_Z, round_off_param)})
             except:
                 returnString.append(
                     {"name": "lost track"})
+        # if sensor == "zed":
+        # #     returnString = []
+        # #     try:
+        # #         for det in detections:
+        # #             x1 = int(det.points[0][0])
+        # #             x2 = int(det.points[1][0])
+        # #             y1 = int(det.points[0][1])
+        # #             y2 = int(det.points[1][1])
+        # #             point3D = pointcloud.get_value((x1+x2)/2, (y1+y2)/2)
+        # #             # print(point3D)
+        # #             round_off_param = 2
+        # #             returnString.append(
+        # #                 {"name": det.label, "x": -round(point3D[1][0] + CONSTANTS.DELTA_X, round_off_param), "y": -round(point3D[1][1] + CONSTANTS.DELTA_Y, round_off_param),  "z": -round(point3D[1][2] + CONSTANTS.DELTA_Z, round_off_param)})
+        # #     except:
+        # #         returnString.append(
+        # #             {"name": "lost track"})
         cv2.imshow("Frame", frame)
         key = cv2.waitKey(1)
         if key == ord('q'):
