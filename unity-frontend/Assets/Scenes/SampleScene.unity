@@ -297,6 +297,17 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &75910473 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9073699848976382821, guid: 4d7e2f87fefe0ba468719b15288b46e7, type: 3}
+  m_PrefabInstance: {fileID: 779280309}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a7683d16dfabed47b17f1f2cbc4de1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &102896429
 GameObject:
   m_ObjectHideFlags: 0
@@ -343,6 +354,7 @@ GameObject:
   m_Component:
   - component: {fileID: 130693948}
   - component: {fileID: 130693947}
+  - component: {fileID: 130693949}
   m_Layer: 0
   m_Name: Explore
   m_TagString: Untagged
@@ -402,6 +414,21 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &130693949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 130693946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44c3f7067740ddf44a58ecc9e6caf9e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gazePosition: {x: 0, y: 0, z: 0}
+  gazeNormalPosition: {x: 0, y: 0, z: 0}
+  controllerLookup: {fileID: 75910473}
 --- !u!1 &172253325
 GameObject:
   m_ObjectHideFlags: 0
