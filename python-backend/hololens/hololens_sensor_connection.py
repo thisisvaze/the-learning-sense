@@ -33,11 +33,11 @@ class VideoStream():
         width = self.capture.get(cv2.CAP_PROP_FRAME_WIDTH)
         height = self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT)
         print(width, height)
+        (self.status, self.frame) = self.capture.read()
         # Start the thread to read frames from the video stream
         self.thread = Thread(target=self.update, args=())
         self.thread.daemon = True
         self.thread.start()
-        (self.status, self.frame) = self.capture.read()
         if (show_stream):
             while True:
                 if self.capture.isOpened():

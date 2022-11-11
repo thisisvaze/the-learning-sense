@@ -57,8 +57,14 @@ class env_context():
     def getCoordinatesOfObjectsInEnvironment(self):
         return self.obj_detection_manager.trackMultipleObjects(
             frame=self.sensor_connection_manager.videoStream.get_current_frame(),
-            pointcloud=self.sensor_connection_manager.videoStream.get_current_point_cloud(),
-            sensor="zed"
+            sensor="hololens",
+            pointcloud=None
+        )
+        return self.obj_detection_manager.trackMultipleObjects(
+            frame=self.sensor_connection_manager.videoStream.get_current_frame(),
+            sensor="hololens",
+            pointcloud=self.sensor_connection_manager.videoStream.get_current_point_cloud()
+
         )
 
     def getObjectCharacterstics(self, color, material):

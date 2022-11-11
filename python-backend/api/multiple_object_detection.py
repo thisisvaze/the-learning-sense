@@ -34,7 +34,7 @@ class norfair_yolo_detection(object):
             hit_counter_max=100
         )
 
-    def trackMultipleObjects(self, frame, pointcloud, sensor):
+    def trackMultipleObjects(self, frame, sensor, pointcloud=None):
         # (status, frame) = capture.read()
         yolo_detections = self.model(
             frame,
@@ -58,18 +58,19 @@ class norfair_yolo_detection(object):
             norfair.draw_boxes(frame, detections)
             norfair.draw_tracked_boxes(
                 frame, tracked_objects, draw_labels=True)
-        # if sensor == "hololens":
-        #     returnString = []
-        #     for det in detections:
-        #         # print(det.points)
-        #         factor = 0.8
-        #         z_index = (500*500)/int((int(det.points[1][0]-det.points[0][0])) *
-        #                                 (int(det.points[1][1]-det.points[0][1])))
-        #         cv2.putText(self.frame, str(int(det.points[0][0]))+", "+str(int(det.points[0][1]))+", "+str(z_index), (50, 50),
-        #                     cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
+        if sensor == "hololens":
+            returnString = []
+            for det in detections:
+                # print(det.points)
+                factor = 0.8
+                # z_index = (500*500)/int((int(det.points[1][0]-det.points[0][0])) *
+                #                       (int(det.points[1][1]-det.points[0][1])))
+                # cv2.putText(frame, str(int(det.points[0][0]))+", "+str(int(det.points[0][1]))+", "+str(z_index), (50, 50),
+                #            cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
 
-        #         returnString.append(
-        #             {"name": det.label, "x": ((det.points[0][0]/216)-1)*factor, "y": (1-(det.points[0][1]/120))*0.5})
+                returnString.append(
+                    {"name": det.label, "x": ((det.points[0][0]/216)-1)*factor, "y": (1-(det.points[0][1]/120))*0.5})
+
         if sensor == "zed":
             returnString = []
             try:
