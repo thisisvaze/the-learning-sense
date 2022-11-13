@@ -85,13 +85,11 @@ async def manageCommunicationWithDevice():
     if session_state == CONSTANTS.SESSION_STATE_DISCONNECTED:
         await asyncio.sleep(0.1)
 
-
 @app.sio.event
 async def connect(sid, environ, auth):
     print('connect ', sid)
     context_handler_obj.session.state = CONSTANTS.SESSION_STATE_EXPLORE
     await manageCommunicationWithDevice()
-
 
 @app.sio.event
 async def disconnect(sid):
