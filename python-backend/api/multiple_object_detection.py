@@ -58,18 +58,18 @@ class norfair_yolo_detection(object):
             norfair.draw_boxes(frame, detections)
             norfair.draw_tracked_boxes(
                 frame, tracked_objects, draw_labels=True)
-        if sensor == "hololens":
-            returnString = []
-            for det in detections:
-                # print(det.points)
-                factor = 0.8
-                # z_index = (500*500)/int((int(det.points[1][0]-det.points[0][0])) *
-                #                       (int(det.points[1][1]-det.points[0][1])))
-                # cv2.putText(frame, str(int(det.points[0][0]))+", "+str(int(det.points[0][1]))+", "+str(z_index), (50, 50),
-                #            cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
+        # if sensor == "hololens":
+        #     returnString = []
+        #     for det in detections:
+        #         # print(det.points)
+        #         factor = 0.8
+        #         # z_index = (500*500)/int((int(det.points[1][0]-det.points[0][0])) *
+        #         #                       (int(det.points[1][1]-det.points[0][1])))
+        #         # cv2.putText(frame, str(int(det.points[0][0]))+", "+str(int(det.points[0][1]))+", "+str(z_index), (50, 50),
+        #         #            cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
 
-                returnString.append(
-                    {"name": det.label, "x": ((det.points[0][0]/216)-1)*factor, "y": (1-(det.points[0][1]/120))*0.5})
+        #         returnString.append(
+        #             {"name": det.label, "x": ((det.points[0][0]/216)-1)*factor, "y": (1-(det.points[0][1]/120))*0.5})
 
         if sensor == "zed":
             returnString = []
@@ -88,7 +88,9 @@ class norfair_yolo_detection(object):
             except:
                 returnString.append(
                     {"name": "lost track"})
+
         cv2.imshow("Frame", frame)
+        #print("multiple_object_detection:" + str(returnString))
         key = cv2.waitKey(1)
         if key == ord('q'):
             cv2.destroyAllWindows()

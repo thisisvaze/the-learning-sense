@@ -42,147 +42,173 @@ from lesson import lesson_helper
 import requests
 from api import message_extraction
 import uvicorn
+from fastapi import WebSocket
 # Init hololens connection
 # connection_manager = hololens_sensor_connection.HololensConnectionManager(
 #     show_stream=False)
 
 p1 = None
 
+
+
 session_started = False
+
+connection_manager = zed_sensor_connection.ZedConnectionManager(
+        show_stream=False)
+
+context_handler_obj = context_handler.context(
+    sensor_connection_manager=connection_manager)
 
 app = FastAPI()
 sio = SocketManager(app=app)
 wit = message_extraction.wit_utilities()
 
+def sendDataToUnity(tag, data):
+    return {CONSTANTS.DATA_TYPE: CONSTANTS.ENVIRONMENT_OJBECTS_UPDATE, CONSTANTS.DATA_VALUE: data}
 
-session_state = "None"
-
-env_data = None
-def env_info_update(shared_data_queue):
-
-    #Init Zed connection
-    connection_manager = zed_sensor_connection.ZedConnectionManager(
-        show_stream=False)
-
-    context_handler_obj = context_handler.context(
-        sensor_connection_manager=connection_manager)
-
-    #lock = Lock()
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
     while True:
-        # lock.acquire()
-        #env_data = {"as":"asd"}
-        #temp = shared_data["Items"]
-        shared_data_queue.put(context_handler_obj.env_context.getDefaultParameters())
-        # shared_data = {
-        #     "Items": context_handler_obj.env_context.getDefaultParameters()}
-        #print("Process zed", shared_data["Items"])
-        # lock.release()
-        # print(str(sio.transport()))
-        # print(data)
-        time.sleep(0.1)
-
-
-
-
-def toggleBool():
-    global boolval
-    boolval = True
-
-
-async def send_env_info():
-    global shared_data_queue
-    global session_state
-    global boolval
-    boolval = True
-    while True:
-        try:
-            await app.sio.sleep(0.5)
-            data_to_send = shared_data_queue.get()
-            #data = copy.deepcopy(data_to_send)
-            print("main_socket_io:" + str(data_to_send))
-            await app.sio.emit(CONSTANTS.ENVIRONMENT_OJBECTS_UPDATE,{"Items":data_to_send})
-        except:
-            pass
-        finally:
-            pass
-        if session_state != CONSTANTS.SESSION_STATE_EXPLORE:
-            break
-
-async def manageCommunicationWithDevice():
-    global session_state
-    print("Session state changed to :" + session_state)
-    if session_state == CONSTANTS.SESSION_STATE_EXPLORE:
-        # asyncio.get_event_loop().create_task(env_info_update())
         
-        app.sio.start_background_task(target=send_env_info)
-        #session_started = True
+        data = await websocket.receive_text()
+        json_data = json.loads(data)
+        if json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.REQUEST_ENV_INFO_UPDATE:
+            print(data)
+            data = {"Items": context_handler_obj.env_context.getDefaultParameters()}
+            await websocket.send_text(f"{sendDataToUnity(CONSTANTS.ENVIRONMENT_OJBECTS_UPDATE, data)}")
+            await asyncio.sleep(0.1)
+        else:
+            print(data)
 
-    if session_state == CONSTANTS.SESSION_STATE_INITIATING_LESSON:
-        await app.sio.emit(CONSTANTS.LESSON_INIT_INFO,
-                           {"Items": lesson_helper.sendLesson()})
+# def env_info_update(shared_data_queue):
 
-    if session_state == CONSTANTS.SESSION_STATE_LAUNCH:
-        await asyncio.sleep(0.1)
+#     #Init Zed connection
+#     connection_manager = zed_sensor_connection.ZedConnectionManager(
+#         show_stream=False)
 
-    if session_state == CONSTANTS.SESSION_STATE_LESSON_INITIATED:
+#     context_handler_obj = context_handler.context(
+#         sensor_connection_manager=connection_manager)
 
-        await asyncio.sleep(0.1)
-
-    if session_state == CONSTANTS.SESSION_STATE_DISCONNECTED:
-        await asyncio.sleep(0.1)
-@app.on_event("startup")
-def startup_event():
-    global p1
-    global session_state
-    global shared_data_queue
-    shared_data_queue = Manager().Queue()
-    p1 = Process(target=env_info_update,
-                args=(shared_data_queue,))
-    p1.start()
-@app.on_event("shutdown")
-def shutdown_event():
-    global p1
-    p1.terminate()
-
-@app.sio.event
-async def connect(sid, environ, auth):
-    print('connect ', sid)
-    global session_state
-    # thread = Thread(target=env_info_update, args=())
-    # thread.daemon = True
-    # thread.start()
-    session_state = CONSTANTS.SESSION_STATE_EXPLORE
-    await manageCommunicationWithDevice()
+#     #lock = Lock()
+#     while True:
+#         # lock.acquire()
+#         #env_data = {"as":"asd"}
+#         #temp = shared_data["Items"]
+#         shared_data_queue.put(context_handler_obj.env_context.getDefaultParameters())
+#         # shared_data = {
+#         #     "Items": context_handler_obj.env_context.getDefaultParameters()}
+#         #print("Process zed", shared_data["Items"])
+#         # lock.release()
+#         # print(str(sio.transport()))
+#         # print(data)
+# #         time.sleep(0.1)
 
 
-@app.sio.event
-async def disconnect(sid):
-    global session_state
-    global p1
-    print('disconnect ', sid)
-
-    session_state = CONSTANTS.SESSION_STATE_DISCONNECTED
-    await manageCommunicationWithDevice()
 
 
-@app.sio.on(CONSTANTS.INITIATE_LESSON_REQUEST)
-async def root():
-    global session_state
-    session_state = CONSTANTS.SESSION_STATE_INITIATING_LESSON
-    await manageCommunicationWithDevice()
+# def toggleBool():
+#     global boolval
+#     boolval = True
 
 
-@app.sio.on(CONSTANTS.SPEECH_SENTENCE_SPOKEN)
-async def root(sid, data):
-    global session_state
-    if session_state == CONSTANTS.SESSION_STATE_LESSON_INITIATED:
-        lesson_helper.handle_message(str(wit.infer_message(data)))
-    else:
-        print(CONSTANTS.SPEECH_SENTENCE_SPOKEN + data)
+# async def send_env_info():
+#     global shared_data_queue
+#     global session_state
+#     global boolval
+#     boolval = True
+#     while True:
+#         try:
+#             await app.sio.sleep(0.5)
+#             data_to_send = shared_data_queue.get()
+#             #data = copy.deepcopy(data_to_send)
+#             print("main_socket_io:" + str(data_to_send))
+#             await app.sio.emit(CONSTANTS.ENVIRONMENT_OJBECTS_UPDATE,{"Items":data_to_send})
+#         except:
+#             pass
+#         finally:
+#             pass
+#         if session_state != CONSTANTS.SESSION_STATE_EXPLORE:
+#             break
 
-@app.sio.on(CONSTANTS.BUTTON_PRESSED)
-async def root(sid, data):
-    print(data)
+# async def manageCommunicationWithDevice():
+#     global session_state
+#     print("Session state changed to :" + session_state)
+#     if session_state == CONSTANTS.SESSION_STATE_EXPLORE:
+#         # asyncio.get_event_loop().create_task(env_info_update())
+        
+#         app.sio.start_background_task(target=send_env_info)
+#         #session_started = True
+
+#     if session_state == CONSTANTS.SESSION_STATE_INITIATING_LESSON:
+#         await app.sio.emit(CONSTANTS.LESSON_INIT_INFO,
+#                            {"Items": lesson_helper.sendLesson()})
+
+#     if session_state == CONSTANTS.SESSION_STATE_LAUNCH:
+#         await asyncio.sleep(0.1)
+
+#     if session_state == CONSTANTS.SESSION_STATE_LESSON_INITIATED:
+
+#         await asyncio.sleep(0.1)
+
+#     if session_state == CONSTANTS.SESSION_STATE_DISCONNECTED:
+#         await asyncio.sleep(0.1)
+
+
+
+# @app.on_event("startup")
+# def startup_event():
+#     global p1
+#     global session_state
+#     global shared_data_queue
+#     shared_data_queue = Manager().Queue()
+#     p1 = Process(target=env_info_update,
+#                 args=(shared_data_queue,))
+#     p1.start()
+# @app.on_event("shutdown")
+# def shutdown_event():
+#     global p1
+#     p1.terminate()
+
+# @app.sio.event
+# async def connect(sid, environ, auth):
+#     print('connect ', sid)
+#     global session_state
+#     # thread = Thread(target=env_info_update, args=())
+#     # thread.daemon = True
+#     # thread.start()
+#     session_state = CONSTANTS.SESSION_STATE_EXPLORE
+#     await manageCommunicationWithDevice()
+
+
+# @app.sio.event
+# async def disconnect(sid):
+#     global session_state
+#     global p1
+#     print('disconnect ', sid)
+
+#     session_state = CONSTANTS.SESSION_STATE_DISCONNECTED
+#     await manageCommunicationWithDevice()
+
+
+# @app.sio.on(CONSTANTS.INITIATE_LESSON_REQUEST)
+# async def root():
+#     global session_state
+#     session_state = CONSTANTS.SESSION_STATE_INITIATING_LESSON
+#     await manageCommunicationWithDevice()
+
+
+# @app.sio.on(CONSTANTS.SPEECH_SENTENCE_SPOKEN)
+# async def root(sid, data):
+#     global session_state
+#     if session_state == CONSTANTS.SESSION_STATE_LESSON_INITIATED:
+#         lesson_helper.handle_message(str(wit.infer_message(data)))
+#     else:
+#         print(CONSTANTS.SPEECH_SENTENCE_SPOKEN + data)
+
+# @app.sio.on(CONSTANTS.BUTTON_PRESSED)
+# async def root(sid, data):
+#     print(data)
 
 
 # @app.post("/sendData")
@@ -298,7 +324,7 @@ def main():
     # global env_data
     # env_data = shared_data_queue
     #print("this is the shared data", shared_data_queue.get())
-    uvicorn.run("main_socketio:app", host="0.0.0.0", port=8000, log_level="info", reload=True)
+    uvicorn.run("main_websockets:app", host="0.0.0.0", port=8000, log_level="info", reload=True)
 if __name__ == "__main__":
     main()
     

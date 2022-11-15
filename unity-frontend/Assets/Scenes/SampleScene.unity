@@ -539,6 +539,7 @@ GameObject:
   - component: {fileID: 209471515}
   - component: {fileID: 209471514}
   - component: {fileID: 209471518}
+  - component: {fileID: 209471519}
   m_Layer: 0
   m_Name: EmptyGameObject
   m_TagString: Untagged
@@ -568,7 +569,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 209471503}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0d47983fdc7a1be4683a46bce4eb4214, type: 3}
   m_Name: 
@@ -623,6 +624,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LOG: SpeechRecognitionManager
+--- !u!114 &209471519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 209471503}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f22aa43b1da15b447911b04bae79105b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LOG: WebSocketConnectionClient
 --- !u!1 &362110411
 GameObject:
   m_ObjectHideFlags: 0

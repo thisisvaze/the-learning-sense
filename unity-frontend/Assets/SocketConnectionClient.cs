@@ -73,21 +73,23 @@ public class SocketConnectionClient : MonoBehaviour
         socket = new SocketIOUnity(uri, new SocketIOOptions
         {
             Path = "/ws/socket.io",
-            Transport = SocketIOClient.Transport.TransportProtocol.WebSocket
+            Transport = SocketIOClient.Transport.TransportProtocol.WebSocket,
+            AutoUpgrade = false,
+            Reconnection = true
         });
         ///// reserved socketio events
         socket.OnConnected += (sender, e) =>
         {
             Debug.Log("Socket connected with Server");
         };
-        // socket.OnPing += (sender, e) =>
-        // {
-        //     Debug.Log("Ping");
-        // };
-        // socket.OnPong += (sender, e) =>
-        // {
-        //     Debug.Log("Pong: " + e.TotalMilliseconds);
-        // };
+        socket.OnPing += (sender, e) =>
+        {
+            Debug.Log("Ping");
+        };
+        socket.OnPong += (sender, e) =>
+        {
+            Debug.Log("Pong: " + e.TotalMilliseconds);
+        };
 
 
         socket.OnDisconnected += (sender, e) =>
@@ -100,18 +102,26 @@ public class SocketConnectionClient : MonoBehaviour
         };
 
         Debug.Log("Connecting...");
-        socket.Connect();
+        socket.ConnectAsync();
 
-        socket.On(Constants.ENVIRONMENT_OJBECTS_UPDATE, (response) =>
+        socket.On(Constants.ENVIRONMENT_OJBECTS_UPDATE, async response =>
         {
+            string message = response.GetValue().GetRawText();
+            // UnityThread.executeInUpdate(() =>
+            // {
 
-            UnityThread.executeInUpdate(() =>
-            {
-                string message = response.GetValue().GetRawText();
-                EventManager.TriggerEvent(Constants.ENVIRONMENT_OJBECTS_UPDATE, message);
-                Debug.Log(LOG + ": " + message);
-                JSONNode jsonResponse = JSONArray.Parse(message);
-            });
+            //     Debug.Log(LOG + ": " + message);
+            //     JSONNode jsonResponse = JSONArray.Parse(message);
+            //     Debug.Log(LOG + ": " + jsonResponse[0]["name"]);
+            //     EventManager.TriggerEvent(Constants.ENVIRONMENT_OJBECTS_UPDATE, message);
+
+
+            // });
+
+            await response.CallbackAsync(message);
+            Debug.Log(LOG + ": " + message);
+            JSONNode jsonResponse = JSONArray.Parse(message);
+            Debug.Log(LOG + ": " + jsonResponse[0]["name"]);
 
         });
 

@@ -26,6 +26,7 @@ using NativeWebSocket;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine.XR.Interaction.Toolkit;
+using SimpleJSON;
 
 public class ExploreState : MonoBehaviour
 {
@@ -49,7 +50,7 @@ public class ExploreState : MonoBehaviour
 
         //markers[0].OnClicked()
 
-
+        InvokeRepeating("GetEnvironmentUpdates", 0.0f, 0.5f);
     }
 
     private void OnButtonEnabled(SelectEnterEventArgs arg0)
@@ -58,7 +59,10 @@ public class ExploreState : MonoBehaviour
         EventManager.TriggerEvent(Constants.BUTTON_PRESSED, arg0.ToString());
     }
 
-
+    void GetEnvironmentUpdates()
+    {
+        EventManager.TriggerEvent(Constants.REQUEST_ENV_INFO_UPDATE, "None");
+    }
     void OnEnable()
     {
         //markers[0] = (Instantiate(labelType, Camera.main.transform.position, Camera.main.transform.rotation) as GameObject);
@@ -74,6 +78,7 @@ public class ExploreState : MonoBehaviour
     {
 
         gameObject.transform.position = new Vector3(delta_x, delta_y, delta_z);
+
         //Debug.Log("Object seen: "+envInfo.name);
         // Debug.Log("here: "+ finalPosition);
         //Debug.Log("Text:"+gameObject.transform.position);
@@ -84,48 +89,49 @@ public class ExploreState : MonoBehaviour
     }
 
 
-    void OnEnvironmentUpdate(string message)
+    void OnEnvironmentUpdate(String msg)
     {
 
-        JsonData.EnvironmentInfo[] EnvInfo = JsonData.JsonHelper.FromJson<JsonData.EnvironmentInfo>(message);
+        JSONNode message = JSONArray.Parse(msg);
+        Debug.Log(Constants.DATA_TYPE + message[Constants.DATA_TYPE]);
+        //JsonData.EnvironmentInfo[] EnvInfo = JsonData.JsonHelper.FromJson<JsonData.EnvironmentInfo>(message);
         //Debug.Log("Recieved by Explore State: " + EnvInfo);
+
+        //Debug.Log(info[0].name);
+
+        //Vector3 forwardPosition = Camera.main.transform.rotation * Vector3.forward;
+        //Vector3 labdateelFaceRotation = Vector3.Cross(forwardPosition, new Vector3(0,1,0.1)).normalized;
         int i = 0;
-        if (EnvInfo.Length > 0)
+        while (i < 10)
         {
+            JSONNode item = message[Constants.DATA_VALUE]["Items"][i];
 
-            //Debug.Log(info[0].name);
+            Debug.Log("Object seen: " + item["name"]);
+            Vector3 finalPosition = new Vector3(0, 0, 0);
 
-            //Vector3 forwardPosition = Camera.main.transform.rotation * Vector3.forward;
-            //Vector3 labdateelFaceRotation = Vector3.Cross(forwardPosition, new Vector3(0,1,0.1)).normalized;
-            foreach (JsonData.EnvironmentInfo envInfo in EnvInfo)
-            {
-                //Debug.Log("Object seen: "+envInfo.name);
-                Vector3 finalPosition = new Vector3(0, 0, 0);
+            finalPosition =
+                                new Vector3((float.Parse(item["x"])), (float.Parse(item["y"])), (float.Parse(item["z"])));
 
-                finalPosition =
-                                    new Vector3((float.Parse(envInfo.x)), (float.Parse(envInfo.y)), (float.Parse(envInfo.z)));
-
-                // Vector3 forwardPosition = Camera.main.transform.rotation * Vector3.forward;
-                // finalPosition = Camera.main.transform.position + 0.8f * forwardPosition +
-                //             new Vector3((float.Parse(envInfo.x)), (float.Parse(envInfo.y)), (float.Parse(envInfo.z)));
+            // Vector3 forwardPosition = Camera.main.transform.rotation * Vector3.forward;
+            // finalPosition = Camera.main.transform.position + 0.8f * forwardPosition +
+            //             new Vector3((float.Parse(envInfo.x)), (float.Parse(envInfo.y)), (float.Parse(envInfo.z)));
 
 
-                //Camera.main.transform.position + 0.8f*forwardPosition + new Vector3((float.Parse(labelInfo.x)) , (float.Parse(labelInfo.y)) , 0);
-                //Debug.Log("here: "+ finalPosition);
-                //
-                Debug.Log("Object seen: " + envInfo.name);
-                Debug.Log("here: " + finalPosition);
-                Debug.Log("Text:" + gameObject.transform.position);
-                Debug.Log("Text:" + gameObject.GetComponentInChildren<TMP_Text>().text);
-                markers[i].transform.position = finalPosition;
-                markers[i].transform.rotation = Camera.main.transform.rotation;
-                markers[i].GetComponentInChildren<TMP_Text>().text = envInfo.name;
-
-                i++;
-            }
-
-
+            //Camera.main.transform.position + 0.8f*forwardPosition + new Vector3((float.Parse(labelInfo.x)) , (float.Parse(labelInfo.y)) , 0);
+            //Debug.Log("here: "+ finalPosition);
+            //
+            //Debug.Log("Object seen: " + envInfo.name);
+            //Debug.Log("here: " + finalPosition);
+            //Debug.Log("Text:" + gameObject.transform.position);
+            //Debug.Log("Text:" + gameObject.GetComponentInChildren<TMP_Text>().text);
+            markers[i].transform.position = finalPosition;
+            markers[i].transform.rotation = Camera.main.transform.rotation;
+            markers[i].GetComponentInChildren<TMP_Text>().text = item["name"];
+            i++;
         }
+
+
+
 
     }
 
