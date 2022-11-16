@@ -29,6 +29,6 @@ def on_message(data):
     print('I received a message!')
 
 
-sio.connect('ws://192.168.0.72:8000/',
-            socketio_path='ws/socket.io')
+sio.connect('ws://localhost:8000/',
+            socketio_path='ws')
 sio.wait()

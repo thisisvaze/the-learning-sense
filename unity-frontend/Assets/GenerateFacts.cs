@@ -33,16 +33,17 @@ public class GenerateFacts : MonoBehaviour
     public Renderer quadRenderer;
     public Texture2D texture = null;
     public bool done = false;
-      public GameObject button;
+    public GameObject button;
     public GameObject labels;
 
- [Serializable]
-        public class position{
-            public string x;
-            public string y; 
-            public string z;
-        }  
-    
+    [Serializable]
+    public class position
+    {
+        public string x;
+        public string y;
+        public string z;
+    }
+
     public static class JsonHelper
     {
         public static T[] FromJson<T>(string json)
@@ -71,62 +72,65 @@ public class GenerateFacts : MonoBehaviour
     WebSocket websocket;
 
     DictationRecognizer m_DictationRecognizer;
-    async void setupClientSocket(){
-        
-    websocket = new WebSocket("ws://localhost:8000/ws");
-
-    websocket.OnOpen += () =>
+    async void setupClientSocket()
     {
-      Debug.Log("Listening to Hololens Speech");
-    };
 
-    websocket.OnError += (e) =>
-    {
-      Debug.Log("Speech Error! " + e);
-    };
+        websocket = new WebSocket("ws://localhost:8000/ws");
 
-    websocket.OnClose += (e) =>
-    {
-      Debug.Log("Speech Connection closed!");
-    };
+        websocket.OnOpen += () =>
+        {
+            Debug.Log("Listening to Hololens Speech");
+        };
 
-    websocket.OnMessage += (bytes) =>
-    {
-      //Debug.Log("OnMessage!");
-      //Debug.Log(bytes);
+        websocket.OnError += (e) =>
+        {
+            Debug.Log("Speech Error! " + e);
+        };
 
-      // getting the message as a string
-      var message = System.Text.Encoding.UTF8.GetString(bytes);
-      message = message.Replace("'","\"");
-      Debug.Log(message);
-      handleResponse(message);
-     };
-      // Keep sending messages at every 0.3s
-    //InvokeRepeating("SendWebSocketMessage", 0.0f, 2f);
+        websocket.OnClose += (e) =>
+        {
+            Debug.Log("Speech Connection closed!");
+        };
 
-    // waiting for messages
-    await websocket.Connect();
+        websocket.OnMessage += (bytes) =>
+        {
+            //Debug.Log("OnMessage!");
+            //Debug.Log(bytes);
+
+            // getting the message as a string
+            var message = System.Text.Encoding.UTF8.GetString(bytes);
+            message = message.Replace("'", "\"");
+            Debug.Log(message);
+            handleResponse(message);
+        };
+        // Keep sending messages at every 0.3s
+        //InvokeRepeating("SendWebSocketMessage", 0.0f, 2f);
+
+        // waiting for messages
+        await websocket.Connect();
     }
 
-    private void handleResponse(string message){
-      //generateLessonItem(message);
-      generateFactItem(message);
+    private void handleResponse(string message)
+    {
+        //generateLessonItem(message);
+        generateFactItem(message);
     }
-     
-    private void setupDictationRecognizer(){
+
+    private void setupDictationRecognizer()
+    {
         m_DictationRecognizer = new DictationRecognizer();
 
         m_DictationRecognizer.DictationResult += (text, confidence) =>
         // 
         {
-         Debug.LogFormat("Dictation result: {0}", text);
-   
+            Debug.LogFormat("Dictation result: {0}", text);
 
-             
-              
-           
-           //m_Recognitions.text += text + "\n";
-            
+
+
+
+
+            //m_Recognitions.text += text + "\n";
+
 
         };
 
@@ -134,12 +138,12 @@ public class GenerateFacts : MonoBehaviour
         {
             Debug.LogFormat("Dictation hypothesis: {0}", text);
 
-          SendWebSocketMessage(text);
-    
+            SendWebSocketMessage(text);
 
-            
+
+
             //  float scale = 0.1f;
-            
+
             //   switch (text)
             // {
             //     case "earth": scale =  0.1f;break;
@@ -148,31 +152,31 @@ public class GenerateFacts : MonoBehaviour
             //     default: scale = 0.1f; break;
             // }
             // generateCustomFromURL(modelMap[text], scale);
-           // m_Hypotheses.text += text;
+            // m_Hypotheses.text += text;
         };
 
         m_DictationRecognizer.DictationComplete += (completionCause) =>
         {
             switch (completionCause)
-              {
-              case DictationCompletionCause.TimeoutExceeded:
-              case DictationCompletionCause.PauseLimitExceeded:
-              case DictationCompletionCause.Canceled:
-              case DictationCompletionCause.Complete:
-              // Restart required
-               m_DictationRecognizer.Stop();
-               m_DictationRecognizer.Start();
-              break;
-              case DictationCompletionCause.UnknownError:
-              case DictationCompletionCause.AudioQualityFailure:
-              case DictationCompletionCause.MicrophoneUnavailable:
-              case DictationCompletionCause.NetworkFailure:
-              // Error
-              m_DictationRecognizer.Stop();
-              break;
-              }
-                
-            
+            {
+                case DictationCompletionCause.TimeoutExceeded:
+                case DictationCompletionCause.PauseLimitExceeded:
+                case DictationCompletionCause.Canceled:
+                case DictationCompletionCause.Complete:
+                    // Restart required
+                    m_DictationRecognizer.Stop();
+                    m_DictationRecognizer.Start();
+                    break;
+                case DictationCompletionCause.UnknownError:
+                case DictationCompletionCause.AudioQualityFailure:
+                case DictationCompletionCause.MicrophoneUnavailable:
+                case DictationCompletionCause.NetworkFailure:
+                    // Error
+                    m_DictationRecognizer.Stop();
+                    break;
+            }
+
+
         };
 
         m_DictationRecognizer.DictationError += (error, hresult) =>
@@ -194,47 +198,49 @@ public class GenerateFacts : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        #if !UNITY_WEBGL || UNITY_EDITOR
+#if !UNITY_WEBGL || UNITY_EDITOR
         websocket.DispatchMessageQueue();
-        #endif
+#endif
     }
 
 
-private void generateFactItem(string message){                                         
-                    Vector3 forwardPosition = Camera.main.transform.rotation * Vector3.forward;
-                    //Vector3 labelFaceRotation = Vector3.Cross(forwardPosition, new Vector3(0,1,0.1f)).normalized;
-                    Vector3 finalPosition = Camera.main.transform.position + 0.5f*forwardPosition + new Vector3(0f , 0.05f, 0);
-                    Debug.Log(finalPosition);
-                    
-                    if(done == false){
-                        button = (Instantiate(labels, finalPosition, Camera.main.transform.rotation));
-                        done = true;
-                    }
-                    
-                   button.GetComponentInChildren<TMP_Text>().text = message;
-                        button.active = true;
-                        button.transform.position = finalPosition;
-                        button.transform.rotation =  Camera.main.transform.rotation;
-            
+    private void generateFactItem(string message)
+    {
+        Vector3 forwardPosition = Camera.main.transform.rotation * Vector3.forward;
+        //Vector3 labelFaceRotation = Vector3.Cross(forwardPosition, new Vector3(0,1,0.1f)).normalized;
+        Vector3 finalPosition = Camera.main.transform.position + 0.5f * forwardPosition + new Vector3(0f, 0.05f, 0);
+        Debug.Log(finalPosition);
 
-}
+        if (done == false)
+        {
+            button = (Instantiate(labels, finalPosition, Camera.main.transform.rotation));
+            done = true;
+        }
+
+        button.GetComponentInChildren<TMP_Text>().text = message;
+        button.active = true;
+        button.transform.position = finalPosition;
+        button.transform.rotation = Camera.main.transform.rotation;
+
+
+    }
 
     async void SendWebSocketMessage(string text)
     {
         if (websocket.State == WebSocketState.Open)
         {
-        // Sending bytes
-        //await websocket.Send(new byte[] { 10, 20, 30 });
+            // Sending bytes
+            //await websocket.Send(new byte[] { 10, 20, 30 });
 
-        // Sending plain text
+            // Sending plain text
             await websocket.SendText(text);
             Debug.Log("Speech text sent");
         }
     }
 
     private async void OnApplicationQuit()
-  {
-    await websocket.Close();
-  }
+    {
+        await websocket.Close();
+    }
 
 }

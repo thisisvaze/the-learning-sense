@@ -28,20 +28,20 @@ using System.Threading.Tasks;
 public class ShowLesson : MonoBehaviour
 {
 
-    IDictionary<string,string> modelMap = null;
+    IDictionary<string, string> modelMap = null;
     bool plantCellShown = false;
     GameObject empty;
-    GLTFast.GltfAsset gltf; 
+    GLTFast.GltfAsset gltf;
     Texture2D targetTexture = null;
     public GameObject quad;
     public Renderer quadRenderer;
     public Texture2D texture = null;
     public float delta_x = 0, delta_y = 0, delta_z = 0;
 
-      public GameObject[] buttons = new GameObject[10];
+    public GameObject[] buttons = new GameObject[10];
     public GameObject labels;
     public bool lessonGenerated = false;
-       [Serializable]
+    [Serializable]
     public class LabelInfo
     {
         public string name;
@@ -50,30 +50,33 @@ public class ShowLesson : MonoBehaviour
         public string z;
     }
 
- [Serializable]
-        public class position{
-            public string x;
-            public string y; 
-            public string z;
-        }  
-  [Serializable]
-        public class info{
-            public position position;
-            public string content; 
-        }  
-  [Serializable]
-        public class lesson_objects{
-          public string type;
-          public info info;
-        }
- 
-     [Serializable]
+    [Serializable]
+    public class position
+    {
+        public string x;
+        public string y;
+        public string z;
+    }
+    [Serializable]
+    public class info
+    {
+        public position position;
+        public string content;
+    }
+    [Serializable]
+    public class lesson_objects
+    {
+        public string type;
+        public info info;
+    }
+
+    [Serializable]
     public class LessonItem
     {
         public lesson_objects[] lesson_objects;
     }
-    
-    
+
+
     public static class JsonHelper
     {
         public static T[] FromJson<T>(string json)
@@ -102,55 +105,57 @@ public class ShowLesson : MonoBehaviour
     WebSocket websocket;
 
     DictationRecognizer m_DictationRecognizer;
-    async void setupClientSocket(){
-        
-    websocket = new WebSocket("ws://localhost:8000/ws");
-
-    websocket.OnOpen += () =>
+    async void setupClientSocket()
     {
-      Debug.Log("Connection open");
-    };
 
-    websocket.OnError += (e) =>
-    {
-      Debug.Log("Connection Error! " + e);
-    };
+        websocket = new WebSocket("ws://localhost:8000/ws");
 
-    websocket.OnClose += (e) =>
-    {
-      Debug.Log("Connection closed!");
-    };
+        websocket.OnOpen += () =>
+        {
+            Debug.Log("Connection open");
+        };
 
-    websocket.OnMessage += (bytes) =>
-    {
-      Debug.Log("OnMessage!");
-      //Debug.Log(bytes);
+        websocket.OnError += (e) =>
+        {
+            Debug.Log("Connection Error! " + e);
+        };
 
-      // getting the message as a string
-      var message = System.Text.Encoding.UTF8.GetString(bytes);
-      message = message.Replace("'","\"");
-      //Debug.Log(message);
-      handleResponse(message);
-     };
-      // Keep sending messages at every 0.3s
-    //InvokeRepeating("SendWebSocketMessage", 0.0f, 2f);
+        websocket.OnClose += (e) =>
+        {
+            Debug.Log("Connection closed!");
+        };
 
-    // waiting for messages
-    await websocket.Connect();
+        websocket.OnMessage += (bytes) =>
+        {
+            Debug.Log("OnMessage!");
+            //Debug.Log(bytes);
+
+            // getting the message as a string
+            var message = System.Text.Encoding.UTF8.GetString(bytes);
+            message = message.Replace("'", "\"");
+            //Debug.Log(message);
+            handleResponse(message);
+        };
+        // Keep sending messages at every 0.3s
+        //InvokeRepeating("SendWebSocketMessage", 0.0f, 2f);
+
+        // waiting for messages
+        await websocket.Connect();
     }
 
-        void generateCustomFromURL(string url, float scale)
+    void generateCustomFromURL(string url, float scale)
     {
         Debug.Log("Generate planets GLTF");
         ImportGLTF(url, scale);
     }
 
-    void ImportGLTF(string filepath, float scale) {
-        var empty = new GameObject(); 
+    void ImportGLTF(string filepath, float scale)
+    {
+        var empty = new GameObject();
         gltf = empty.AddComponent<GLTFast.GltfAsset>();
         gltf.url = filepath;
 
-        Vector3 forwardPosition = Camera.main.transform.rotation * Vector3.forward*0.5f;
+        Vector3 forwardPosition = Camera.main.transform.rotation * Vector3.forward * 0.5f;
         Vector3 finalPosition = Camera.main.transform.position + forwardPosition;
         gltf.transform.localPosition = finalPosition;
         //gltf.transform.localScale = new Vector3(1f, 1f, 1f);
@@ -159,41 +164,45 @@ public class ShowLesson : MonoBehaviour
         empty.AddComponent<BoundsControl>();
         empty.AddComponent<ObjectManipulator>();
         empty.AddComponent<ConstraintManager>();
-        
+
         Debug.Log("Generatated");
     }
 
-    private void handleResponse(string message){
-        if(lessonGenerated == false){
+    private void handleResponse(string message)
+    {
+        if (lessonGenerated == false)
+        {
             generateLessonItem(message);
         }
-    
-      lessonGenerated = true;
+
+        lessonGenerated = true;
     }
-     
-    private void setupDictationRecognizer(){
+
+    private void setupDictationRecognizer()
+    {
         m_DictationRecognizer = new DictationRecognizer();
 
         m_DictationRecognizer.DictationResult += (text, confidence) =>
         // 
         {
-        //     if(text.Length>0){
-            
-        //    StartCoroutine(GetWolframResults(text));
-               
-        //     }
+            //     if(text.Length>0){
 
-         Debug.LogFormat("Dictation result: {0}", text);
-            if(text.Contains("what")){
+            //    StartCoroutine(GetWolframResults(text));
 
-             
-              //SendWebSocketMessage(text);
+            //     }
+
+            Debug.LogFormat("Dictation result: {0}", text);
+            if (text.Contains("what"))
+            {
+
+
+                //SendWebSocketMessage(text);
 
             }
-           
 
-           // m_Recognitions.text += text + "\n";
-            
+
+            // m_Recognitions.text += text + "\n";
+
 
         };
 
@@ -202,12 +211,12 @@ public class ShowLesson : MonoBehaviour
             Debug.LogFormat("Dictation hypothesis: {0}", text);
 
 
-             
-             // SendWebSocketMessage(text);
 
-            
+            // SendWebSocketMessage(text);
+
+
             //  float scale = 0.1f;
-            
+
             //   switch (text)
             // {
             //     case "earth": scale =  0.1f;break;
@@ -216,31 +225,31 @@ public class ShowLesson : MonoBehaviour
             //     default: scale = 0.1f; break;
             // }
             // generateCustomFromURL(modelMap[text], scale);
-           // m_Hypotheses.text += text;
+            // m_Hypotheses.text += text;
         };
 
         m_DictationRecognizer.DictationComplete += (completionCause) =>
         {
             switch (completionCause)
-              {
-              case DictationCompletionCause.TimeoutExceeded:
-              case DictationCompletionCause.PauseLimitExceeded:
-              case DictationCompletionCause.Canceled:
-              case DictationCompletionCause.Complete:
-              // Restart required
-               m_DictationRecognizer.Stop();
-               m_DictationRecognizer.Start();
-              break;
-              case DictationCompletionCause.UnknownError:
-              case DictationCompletionCause.AudioQualityFailure:
-              case DictationCompletionCause.MicrophoneUnavailable:
-              case DictationCompletionCause.NetworkFailure:
-              // Error
-              m_DictationRecognizer.Stop();
-              break;
-              }
-                
-            
+            {
+                case DictationCompletionCause.TimeoutExceeded:
+                case DictationCompletionCause.PauseLimitExceeded:
+                case DictationCompletionCause.Canceled:
+                case DictationCompletionCause.Complete:
+                    // Restart required
+                    m_DictationRecognizer.Stop();
+                    m_DictationRecognizer.Start();
+                    break;
+                case DictationCompletionCause.UnknownError:
+                case DictationCompletionCause.AudioQualityFailure:
+                case DictationCompletionCause.MicrophoneUnavailable:
+                case DictationCompletionCause.NetworkFailure:
+                    // Error
+                    m_DictationRecognizer.Stop();
+                    break;
+            }
+
+
         };
 
         m_DictationRecognizer.DictationError += (error, hresult) =>
@@ -252,7 +261,7 @@ public class ShowLesson : MonoBehaviour
         m_DictationRecognizer.AutoSilenceTimeoutSeconds = Mathf.Infinity;
     }
 
-    
+
 
     // Start is called before the first frame update
     void Start()
@@ -274,44 +283,47 @@ public class ShowLesson : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        #if !UNITY_WEBGL || UNITY_EDITOR
+#if !UNITY_WEBGL || UNITY_EDITOR
         websocket.DispatchMessageQueue();
-        #endif
+#endif
     }
-   async void SendWebSocketMessage(string text)
+    async void SendWebSocketMessage(string text)
     {
         if (websocket.State == WebSocketState.Open)
         {
-        // Sending bytes
-        //await websocket.Send(new byte[] { 10, 20, 30 });
+            // Sending bytes
+            //await websocket.Send(new byte[] { 10, 20, 30 });
 
-        // Sending plain text
+            // Sending plain text
             await websocket.SendText(text);
             Debug.Log("Speech text sent");
         }
     }
-    
-private void generateLessonItem(string message){
 
-    LessonItem[] info = JsonHelper.FromJson<LessonItem>(message);
-            if (info.Length > 0) {
-                Debug.Log(info[0]);
-                Debug.Log(info[0].lesson_objects[0].info);
-                Debug.Log(info[0].lesson_objects[0].info.position.y);
+    private void generateLessonItem(string message)
+    {
 
-              
-                //buttons = new GameObject[10];
-             
-                //int i = 0;
-                
-                foreach (lesson_objects lesson_object in info[0].lesson_objects)
+        LessonItem[] info = JsonHelper.FromJson<LessonItem>(message);
+        if (info.Length > 0)
+        {
+            Debug.Log(info[0]);
+            Debug.Log(info[0].lesson_objects[0].info);
+            Debug.Log(info[0].lesson_objects[0].info.position.y);
+
+
+            //buttons = new GameObject[10];
+
+            //int i = 0;
+
+            foreach (lesson_objects lesson_object in info[0].lesson_objects)
+            {
+                if (lesson_object.type == "text")
                 {
-                  if(lesson_object.type == "text"){
                     //Vector3 cameraRelative = cam.TransformPoint((float.Parse(labelInfo.x) - 0.5f) / 3 , (float.Parse(labelInfo.y) - 0.5f )/ 3 , 1.5f);
                     //
                     Vector3 forwardPosition = Camera.main.transform.rotation * Vector3.forward;
                     //Vector3 labelFaceRotation = Vector3.Cross(forwardPosition, new Vector3(0,1,0.1)).normalized;
-                    Vector3 finalPosition = Camera.main.transform.position + 0.8f*forwardPosition + new Vector3((float.Parse(lesson_object.info.position.x) - 0.5f) ,  (0.53f - float.Parse(lesson_object.info.position.y)) , 0);
+                    Vector3 finalPosition = Camera.main.transform.position + 0.8f * forwardPosition + new Vector3((float.Parse(lesson_object.info.position.x) - 0.5f), (0.53f - float.Parse(lesson_object.info.position.y)), 0);
                     //Debug.Log(finalPosition);
                     //
                     // if(buttons[i] != null){
@@ -323,17 +335,18 @@ private void generateLessonItem(string message){
 
                     //     buttons[i] = (Instantiate(labels, finalPosition, Camera.main.transform.rotation));
                     // }
-                    
+
                     GetComponentInChildren<TMP_Text>().text = lesson_object.info.content;
                     this.transform.position = finalPosition;
                     //i++;
-                  }
-                  if(lesson_object.type == "media"){
+                }
+                if (lesson_object.type == "media")
+                {
                     //Vector3 cameraRelative = cam.TransformPoint((float.Parse(labelInfo.x) - 0.5f) / 3 , (float.Parse(labelInfo.y) - 0.5f )/ 3 , 1.5f);
                     //
                     Vector3 forwardPosition = Camera.main.transform.rotation * Vector3.forward;
                     //Vector3 labelFaceRotation = Vector3.Cross(forwardPosition, new Vector3(0,1,0.1)).normalized;
-                    Vector3 finalPosition = Camera.main.transform.position + new Vector3(float.Parse(lesson_object.info.position.x) , float.Parse(lesson_object.info.position.y) ,float.Parse(lesson_object.info.position.z));
+                    Vector3 finalPosition = Camera.main.transform.position + new Vector3(float.Parse(lesson_object.info.position.x), float.Parse(lesson_object.info.position.y), float.Parse(lesson_object.info.position.z));
                     //Debug.Log(finalPosition);
                     //
                     // if(buttons[i] != null){
@@ -346,24 +359,24 @@ private void generateLessonItem(string message){
                     //     buttons[i] = (Instantiate(labels, finalPosition, Camera.main.transform.rotation));
                     // }
 
-                    
-                   // StartCoroutine(RetrieveImageandSetContent(lesson_object.info.content));
-                    
-                   
+
+                    // StartCoroutine(RetrieveImageandSetContent(lesson_object.info.content));
+
+
                     //GetComponentInChildren<TMP_Text>().text = lesson_object.info.content;
                     //i++;
-                  }
-                    
                 }
 
-                // for(int j = info.Length ; j<10; j++){
-                //     if(buttons[j] != null){
-                //         buttons[j].active = false;
-                //     }
-                    
-                // }
             }
 
-}
+            // for(int j = info.Length ; j<10; j++){
+            //     if(buttons[j] != null){
+            //         buttons[j].active = false;
+            //     }
+
+            // }
+        }
+
+    }
 }
 

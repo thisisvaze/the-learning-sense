@@ -64,72 +64,32 @@ sio = SocketManager(app=app)
 wit = message_extraction.wit_utilities()
 
 def sendDataToUnity(tag, data):
-    return {CONSTANTS.DATA_TYPE: CONSTANTS.ENVIRONMENT_OJBECTS_UPDATE, CONSTANTS.DATA_VALUE: data}
+    sendinthisdata = {CONSTANTS.DATA_TYPE: tag, CONSTANTS.DATA_VALUE: data}
+    print(sendinthisdata)
+    return sendinthisdata
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     while True:
-        
         data = await websocket.receive_text()
+        print(data)
         json_data = json.loads(data)
         if json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.REQUEST_ENV_INFO_UPDATE:
-            print(data)
             data = {"Items": context_handler_obj.env_context.getDefaultParameters()}
             await websocket.send_text(f"{sendDataToUnity(CONSTANTS.ENVIRONMENT_OJBECTS_UPDATE, data)}")
-            await asyncio.sleep(0.1)
+            #await asyncio.sleep(0.5)
+        elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.SPEECH_SENTENCE_SPOKEN and context_handler_obj.session.state == CONSTANTS.SESSION_STATE_LESSON_INITIATED:
+            lesson_helper.handle_message(str(wit.infer_message(data)))
+
+        elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.INITIATE_LESSON_REQUEST:
+            context_handler_obj.session.state = CONSTANTS.SESSION_STATE_INITIATING_LESSON
+            await websocket.send_text(f"{sendDataToUnity(CONSTANTS.LESSON_INIT_INFO,lesson_helper.sendLesson(json_data[CONSTANTS.DATA_VALUE]))}")
+            context_handler_obj.session.state = CONSTANTS.SESSION_STATE_LESSON_INITIATED
+        elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.BUTTON_PRESSED:
+            print(json_data[CONSTANTS.DATA_TYPE], json_data[CONSTANTS.DATA_VALUE])
         else:
-            print(data)
-
-# def env_info_update(shared_data_queue):
-
-#     #Init Zed connection
-#     connection_manager = zed_sensor_connection.ZedConnectionManager(
-#         show_stream=False)
-
-#     context_handler_obj = context_handler.context(
-#         sensor_connection_manager=connection_manager)
-
-#     #lock = Lock()
-#     while True:
-#         # lock.acquire()
-#         #env_data = {"as":"asd"}
-#         #temp = shared_data["Items"]
-#         shared_data_queue.put(context_handler_obj.env_context.getDefaultParameters())
-#         # shared_data = {
-#         #     "Items": context_handler_obj.env_context.getDefaultParameters()}
-#         #print("Process zed", shared_data["Items"])
-#         # lock.release()
-#         # print(str(sio.transport()))
-#         # print(data)
-# #         time.sleep(0.1)
-
-
-
-
-# def toggleBool():
-#     global boolval
-#     boolval = True
-
-
-# async def send_env_info():
-#     global shared_data_queue
-#     global session_state
-#     global boolval
-#     boolval = True
-#     while True:
-#         try:
-#             await app.sio.sleep(0.5)
-#             data_to_send = shared_data_queue.get()
-#             #data = copy.deepcopy(data_to_send)
-#             print("main_socket_io:" + str(data_to_send))
-#             await app.sio.emit(CONSTANTS.ENVIRONMENT_OJBECTS_UPDATE,{"Items":data_to_send})
-#         except:
-#             pass
-#         finally:
-#             pass
-#         if session_state != CONSTANTS.SESSION_STATE_EXPLORE:
-#             break
+            pass
 
 # async def manageCommunicationWithDevice():
 #     global session_state

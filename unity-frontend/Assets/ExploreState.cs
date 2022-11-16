@@ -40,6 +40,7 @@ public class ExploreState : MonoBehaviour
     void Start()
     {
 
+
         for (int i = 0; i < 20; i++)
         {
             markers[i] = (Instantiate(labelType, Camera.main.transform.position, Camera.main.transform.rotation) as GameObject);
@@ -50,18 +51,19 @@ public class ExploreState : MonoBehaviour
 
         //markers[0].OnClicked()
 
-        InvokeRepeating("GetEnvironmentUpdates", 0.0f, 0.5f);
+        InvokeRepeating("GetEnvironmentUpdates", 0.0f, 5f);
     }
 
     private void OnButtonEnabled(SelectEnterEventArgs arg0)
     {
         Debug.Log("Button Clicked" + arg0.ToString());
         EventManager.TriggerEvent(Constants.BUTTON_PRESSED, arg0.ToString());
+        EventManager.TriggerEvent(Constants.INITIATE_LESSON_REQUEST, "cup");
     }
 
     void GetEnvironmentUpdates()
     {
-        EventManager.TriggerEvent(Constants.REQUEST_ENV_INFO_UPDATE, "None");
+        EventManager.TriggerEvent(Constants.REQUEST_ENV_INFO_UPDATE, "Requesting env information");
     }
     void OnEnable()
     {
@@ -77,7 +79,7 @@ public class ExploreState : MonoBehaviour
     void Update()
     {
 
-        gameObject.transform.position = new Vector3(delta_x, delta_y, delta_z);
+
 
         //Debug.Log("Object seen: "+envInfo.name);
         // Debug.Log("here: "+ finalPosition);
@@ -94,6 +96,7 @@ public class ExploreState : MonoBehaviour
 
         JSONNode message = JSONArray.Parse(msg);
         Debug.Log(Constants.DATA_TYPE + message[Constants.DATA_TYPE]);
+        Debug.Log(Constants.DATA_VALUE + message[Constants.DATA_VALUE]["Items"][0]["name"]);
         //JsonData.EnvironmentInfo[] EnvInfo = JsonData.JsonHelper.FromJson<JsonData.EnvironmentInfo>(message);
         //Debug.Log("Recieved by Explore State: " + EnvInfo);
 
@@ -106,11 +109,10 @@ public class ExploreState : MonoBehaviour
         {
             JSONNode item = message[Constants.DATA_VALUE]["Items"][i];
 
-            Debug.Log("Object seen: " + item["name"]);
+            //Debug.Log("Object seen: " + item["name"]);
             Vector3 finalPosition = new Vector3(0, 0, 0);
-
-            finalPosition =
-                                new Vector3((float.Parse(item["x"])), (float.Parse(item["y"])), (float.Parse(item["z"])));
+            Vector3 deltaVector = new Vector3(delta_x, delta_y, delta_z);
+            finalPosition = new Vector3((float.Parse(item["x"])), (float.Parse(item["y"])), (float.Parse(item["z"]))) + deltaVector;
 
             // Vector3 forwardPosition = Camera.main.transform.rotation * Vector3.forward;
             // finalPosition = Camera.main.transform.position + 0.8f * forwardPosition +
@@ -128,6 +130,7 @@ public class ExploreState : MonoBehaviour
             markers[i].transform.rotation = Camera.main.transform.rotation;
             markers[i].GetComponentInChildren<TMP_Text>().text = item["name"];
             i++;
+
         }
 
 

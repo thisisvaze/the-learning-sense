@@ -12,7 +12,7 @@ public class WebSocketConnectionClient : MonoBehaviour
     // Start is called before the first frame update
     async void Start()
     {
-        websocket = new WebSocket("ws://localhost:8000/ws");
+        websocket = new WebSocket("ws://192.168.0.117:8000/ws");
 
         websocket.OnOpen += () =>
         {
@@ -34,13 +34,11 @@ public class WebSocketConnectionClient : MonoBehaviour
             Debug.Log("OnMessage!");
             var message = System.Text.Encoding.UTF8.GetString(bytes);
             message = message.Replace("'", "\"");
-            //Debug.Log("Message:" + message);
-            // getting the message as a string
-            // var message = System.Text.Encoding.UTF8.GetString(bytes);
+            Debug.Log("Message:" + message);
             JSONNode jsonResponse = JSONArray.Parse(message);
-            //Debug.Log(Constants.DATA_TYPE + jsonResponse[Constants.DATA_TYPE]);
-            //Debug.Log(Constants.DATA_VALUE + jsonResponse[Constants.DATA_VALUE]["Items"][0]["name"]);
-            EventManager.TriggerEvent(jsonResponse[Constants.DATA_TYPE], message);
+            Debug.Log(Constants.DATA_TYPE + jsonResponse[Constants.DATA_TYPE]);
+            Debug.Log(Constants.DATA_VALUE + jsonResponse[Constants.DATA_VALUE]["Items"][0]["name"]);
+            EventManager.TriggerEvent(Constants.ENVIRONMENT_OJBECTS_UPDATE, message);
         };
 
         // Keep sending messages at every 0.3s

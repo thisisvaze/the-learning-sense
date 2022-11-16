@@ -15,7 +15,7 @@ using UnityEngine.UI;
 public class JsonData : MonoBehaviour
 {
 
-     public static class JsonHelper
+    public static class JsonHelper
     {
         public static T[] FromJson<T>(string json)
         {
@@ -40,8 +40,8 @@ public class JsonData : MonoBehaviour
             public T[] Items;
         }
     }
-    
-    
+
+
     [Serializable]
     public class EnvironmentInfo
     {
@@ -51,28 +51,31 @@ public class JsonData : MonoBehaviour
         public string z;
     }
 
- [Serializable]
-        public class position{
-            public string x;
-            public string y; 
-            public string z;
-        }  
-  [Serializable]
-        public class info{
-            public position position;
-            public string content; 
-        }  
-  [Serializable]
-        public class lesson_objects{
-          public string type;
-          public info info;
-        }
- 
-     [Serializable]
+    [Serializable]
+    public class position
+    {
+        public string x;
+        public string y;
+        public string z;
+    }
+    [Serializable]
+    public class info
+    {
+        public position position;
+        public string content;
+    }
+    [Serializable]
+    public class lesson_objects
+    {
+        public string type;
+        public info info;
+    }
+
+    [Serializable]
     public class LessonItem
     {
         public lesson_objects[] lesson_objects;
     }
 
-    
+
 }
