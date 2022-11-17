@@ -10,9 +10,17 @@ def initiate_curiousityAndSendToHeadset():
         lesson_object = json.load(lesson_content)
         return json.dumps(lesson_object)
 
+
 def handle_message(message):
-    wit_response_message = json.loads(message)
-    print(wit_response_message)
+    print(message)
+    try:
+        for entity in message['entities']['3d_model:3d_model']:
+            return entity['body']
+    except:
+        print("none found")
+    return message
+    #wit_response_message = json.loads(message)
+    # print(wit_response_message)
 
 # # def choose_lesson():
 # #     with open("sample_context.json") as json_file:

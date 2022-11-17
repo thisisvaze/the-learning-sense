@@ -37,8 +37,7 @@ public class WebSocketConnectionClient : MonoBehaviour
             Debug.Log("Message:" + message);
             JSONNode jsonResponse = JSONArray.Parse(message);
             Debug.Log(Constants.DATA_TYPE + jsonResponse[Constants.DATA_TYPE]);
-            Debug.Log(Constants.DATA_VALUE + jsonResponse[Constants.DATA_VALUE]["Items"][0]["name"]);
-            EventManager.TriggerEvent(Constants.ENVIRONMENT_OJBECTS_UPDATE, message);
+            EventManager.TriggerEvent(jsonResponse[Constants.DATA_TYPE], message);
         };
 
         // Keep sending messages at every 0.3s
@@ -74,6 +73,7 @@ public class WebSocketConnectionClient : MonoBehaviour
         //markers[0] = (Instantiate(labelType, Camera.main.transform.position, Camera.main.transform.rotation) as GameObject);
         EventManager.StartListening(Constants.SPEECH_SENTENCE_SPOKEN, OnSentenceSpoken);
         EventManager.StartListening(Constants.BUTTON_PRESSED, OnInputRecieved);
+        EventManager.StartListening(Constants.INITIATE_LESSON_REQUEST, OnLessonInitiateRequestRecieved);
         EventManager.StartListening(Constants.REQUEST_ENV_INFO_UPDATE, OnEnvironmentInfoRequested);
     }
 
@@ -83,7 +83,15 @@ public class WebSocketConnectionClient : MonoBehaviour
         EventManager.StopListening(Constants.BUTTON_PRESSED, OnInputRecieved);
         EventManager.StartListening(Constants.REQUEST_ENV_INFO_UPDATE, OnEnvironmentInfoRequested);
     }
-
+    private void OnLessonInitiateRequestRecieved(string message)
+    {
+        Debug.Log(LOG + " Sending  " + message + "to server");
+        Dictionary<string, string> dict = new Dictionary<string, string>();
+        dict.Add(Constants.DATA_TYPE, Constants.INITIATE_LESSON_REQUEST);
+        dict.Add(Constants.DATA_VALUE, message);
+        string send_this = JsonSerializer.Serialize(dict);
+        SendWebSocketMessage(send_this);
+    }
     private void OnEnvironmentInfoRequested(string message)
     {
         Debug.Log(LOG + " Sending  " + message + "to server");

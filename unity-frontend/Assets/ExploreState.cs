@@ -35,12 +35,8 @@ public class ExploreState : MonoBehaviour
 
     public PressableButton button;
     public GameObject[] markers = new GameObject[20];
-
-    // Start is called before the first frame update
     void Start()
     {
-
-
         for (int i = 0; i < 20; i++)
         {
             markers[i] = (Instantiate(labelType, Camera.main.transform.position, Camera.main.transform.rotation) as GameObject);
@@ -48,9 +44,6 @@ public class ExploreState : MonoBehaviour
             markers[i].transform.parent = gameObject.transform;
             markers[i].GetComponentInChildren<PressableButton>().selectEntered.AddListener(OnButtonEnabled);
         }
-
-        //markers[0].OnClicked()
-
         InvokeRepeating("GetEnvironmentUpdates", 0.0f, 5f);
     }
 
@@ -67,8 +60,8 @@ public class ExploreState : MonoBehaviour
     }
     void OnEnable()
     {
-        //markers[0] = (Instantiate(labelType, Camera.main.transform.position, Camera.main.transform.rotation) as GameObject);
         EventManager.StartListening(Constants.ENVIRONMENT_OJBECTS_UPDATE, OnEnvironmentUpdate);
+
     }
 
     void OnDisable()
@@ -78,63 +71,31 @@ public class ExploreState : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
-
-
-        //Debug.Log("Object seen: "+envInfo.name);
-        // Debug.Log("here: "+ finalPosition);
-        //Debug.Log("Text:"+gameObject.transform.position);
-        //Debug.Log("Text:"+gameObject.GetComponentInChildren<TMP_Text>().text);
-        //gameObject.transform.position = finalPosition;
-        //gameObject.transform.rotation =  Camera.main.transform.rotation;
-        //gameObject.GetComponentInChildren<TMP_Text>().text = envInfo.name;
+        // int i = 0;
+        // while (i < 20)
+        // {
+        //     markers[i].transform.rotation = Camera.main.transform.rotation;
+        // }
+        // i++;
     }
-
-
     void OnEnvironmentUpdate(String msg)
     {
-
         JSONNode message = JSONArray.Parse(msg);
         Debug.Log(Constants.DATA_TYPE + message[Constants.DATA_TYPE]);
         Debug.Log(Constants.DATA_VALUE + message[Constants.DATA_VALUE]["Items"][0]["name"]);
-        //JsonData.EnvironmentInfo[] EnvInfo = JsonData.JsonHelper.FromJson<JsonData.EnvironmentInfo>(message);
-        //Debug.Log("Recieved by Explore State: " + EnvInfo);
-
-        //Debug.Log(info[0].name);
-
-        //Vector3 forwardPosition = Camera.main.transform.rotation * Vector3.forward;
-        //Vector3 labdateelFaceRotation = Vector3.Cross(forwardPosition, new Vector3(0,1,0.1)).normalized;
         int i = 0;
-        while (i < 10)
+        while (i < 20)
         {
             JSONNode item = message[Constants.DATA_VALUE]["Items"][i];
-
-            //Debug.Log("Object seen: " + item["name"]);
             Vector3 finalPosition = new Vector3(0, 0, 0);
             Vector3 deltaVector = new Vector3(delta_x, delta_y, delta_z);
             finalPosition = new Vector3((float.Parse(item["x"])), (float.Parse(item["y"])), (float.Parse(item["z"]))) + deltaVector;
-
-            // Vector3 forwardPosition = Camera.main.transform.rotation * Vector3.forward;
-            // finalPosition = Camera.main.transform.position + 0.8f * forwardPosition +
-            //             new Vector3((float.Parse(envInfo.x)), (float.Parse(envInfo.y)), (float.Parse(envInfo.z)));
-
-
-            //Camera.main.transform.position + 0.8f*forwardPosition + new Vector3((float.Parse(labelInfo.x)) , (float.Parse(labelInfo.y)) , 0);
-            //Debug.Log("here: "+ finalPosition);
-            //
-            //Debug.Log("Object seen: " + envInfo.name);
-            //Debug.Log("here: " + finalPosition);
-            //Debug.Log("Text:" + gameObject.transform.position);
-            //Debug.Log("Text:" + gameObject.GetComponentInChildren<TMP_Text>().text);
             markers[i].transform.position = finalPosition;
             markers[i].transform.rotation = Camera.main.transform.rotation;
             markers[i].GetComponentInChildren<TMP_Text>().text = item["name"];
             i++;
 
         }
-
-
-
 
     }
 

@@ -12,6 +12,10 @@ import Constants.Values as CONSTANTS
 from api.norfair_utilities import Detection, Paths, Tracker, Video
 from norfair.distances import frobenius, iou
 import norfair
+import deepl
+
+auth_key = "f63c02c5-f056-..."  # Replace with your key
+translator = deepl.Translator(auth_key)
 
 DISTANCE_THRESHOLD_BBOX: float = 2
 DISTANCE_THRESHOLD_CENTROID: int = 30
@@ -68,6 +72,8 @@ class norfair_yolo_detection(object):
                 # cv2.putText(frame, str(int(det.points[0][0]))+", "+str(int(det.points[0][1]))+", "+str(z_index), (50, 50),
                 #            cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
 
+                #result = translator.translate_text("Hello, world!", target_lang="FR")
+                # print(result.text)  # "Bonjour, le monde !"
                 returnString.append(
                     {"name": det.label, "x": ((det.points[0][0]/216)-1)*factor, "y": (1-(det.points[0][1]/120))*0.5})
 

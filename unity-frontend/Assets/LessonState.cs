@@ -30,25 +30,22 @@ using SimpleJSON;
 
 public class LessonState : MonoBehaviour
 {
-    public float delta_x = 0, delta_y = 0, delta_z = 0;
-    public GameObject labelType;
     public Texture2D texture = null;
-    public PressableButton button;
-
-    Dictionary<string, string> modelMap = null;
-    public GameObject[] markers = new GameObject[20];
+    Dictionary<string, float> scaleMap = null;
 
     // Start is called before the first frame update
     void Start()
     {
 
-        //SendWebSocketMessage("connected");
-        modelMap = new Dictionary<string, string>(){
-        {"cylinder",   Application.dataPath + "/Resources/cylinder.glb"},
-        {"plant_cell",   Application.dataPath + "/Resources/plant_cell.glb"},
-        {"earth",   Application.dataPath + "/Resources/earth.glb"},
-        {"mars",   Application.dataPath + "/Resources/mars.glb"},
-        {"saturn",   Application.dataPath + "/Resources/saturn.glb"}
+
+
+        scaleMap = new Dictionary<string, float>(){
+        {"cylinder",   0.1f},
+        {"plant_cell",   0.1f},
+        {"moon",   0.0005f},
+        {"earth", 0.1f},
+        {"mars",   0.2f},
+        {"saturn",  0.0001f}
         };
     }
 
@@ -67,11 +64,13 @@ public class LessonState : MonoBehaviour
     {
         //markers[0] = (Instantiate(labelType, Camera.main.transform.position, Camera.main.transform.rotation) as GameObject);
         EventManager.StartListening(Constants.LESSON_INIT_INFO, OnLessonInfoRecieved);
+        EventManager.StartListening(Constants.SHOW_3D_MODEL, Load3DModel);
     }
 
     void OnDisable()
     {
         EventManager.StopListening(Constants.LESSON_INIT_INFO, OnLessonInfoRecieved);
+        EventManager.StartListening(Constants.SHOW_3D_MODEL, Load3DModel);
     }
     // Update is called once per frame
     void Update()
@@ -89,16 +88,36 @@ public class LessonState : MonoBehaviour
     }
 
 
-    void OnLessonInfoRecieved(String msg)
+    void Load3DModel(string msg)
     {
         JSONNode message = JSONArray.Parse(msg);
+        Debug.Log("Model name recieved here" + Constants.DATA_TYPE + message[Constants.DATA_TYPE]);
+        var empty = new GameObject();
+        Debug.Log("Model name recieved here" + message[Constants.DATA_VALUE]);
+        GLTFast.GltfAsset gltf = empty.AddComponent<GLTFast.GltfAsset>();
+        gltf.url = Application.dataPath + "/Resources/" + message[Constants.DATA_VALUE] + ".glb";
+        //gltf.transform.localScale = new Vector3(1f, 1f, 1f);
+        empty.transform.localScale = new Vector3(scaleMap[message[Constants.DATA_VALUE]], scaleMap[message[Constants.DATA_VALUE]], scaleMap[message[Constants.DATA_VALUE]]);
+        empty.AddComponent<BoxCollider>();
+        empty.AddComponent<BoundsControl>();
+        empty.AddComponent<ObjectManipulator>();
+        empty.AddComponent<ConstraintManager>();
+    }
+
+
+    void OnLessonInfoRecieved(String msg)
+    {
+        JSONNode message = JSONString.Parse(msg);
         Debug.Log(Constants.DATA_TYPE + message[Constants.DATA_TYPE]);
-        int i = 0;
-        JSONNode lesson_object = message[Constants.DATA_VALUE]["Items"];
+        Debug.Log("text" + message[Constants.DATA_VALUE]["text"]);
+        Debug.Log("image" + message[Constants.DATA_VALUE]["image_url"]);
+        JSONNode lesson_object = message[Constants.DATA_VALUE];
         Vector3 forwardPosition = Camera.main.transform.rotation * Vector3.forward;
         Vector3 finalPosition = Camera.main.transform.position + 0.8f * forwardPosition;
         GetComponentInChildren<TMP_Text>().text = lesson_object["text"];
         StartCoroutine(RetrieveImageandSetContent(lesson_object["image_url"]));
+        gameObject.transform.position = finalPosition;
+        gameObject.transform.rotation = Camera.main.transform.rotation;
         // foreach (lesson_objects lesson_object in info[0].lesson_objects)
         // {
         //     if (lesson_object.type == "text")

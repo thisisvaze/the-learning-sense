@@ -11,6 +11,7 @@ from api import descriptive_answering, plant_recognition, multiple_object_detect
 from api.norfair_utilities import YOLO, yolo_detections_to_norfair_detections, names
 from fastapi.responses import PlainTextResponse
 import os
+import lesson_generator
 from multiprocessing import Process, Manager
 import asyncio
 import aiohttp
@@ -80,14 +81,16 @@ async def websocket_endpoint(websocket: WebSocket):
             await websocket.send_text(f"{sendDataToUnity(CONSTANTS.ENVIRONMENT_OJBECTS_UPDATE, data)}")
             #await asyncio.sleep(0.5)
         elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.SPEECH_SENTENCE_SPOKEN and context_handler_obj.session.state == CONSTANTS.SESSION_STATE_LESSON_INITIATED:
-            lesson_helper.handle_message(str(wit.infer_message(data)))
+            await websocket.send_text(f"{sendDataToUnity(CONSTANTS.SHOW_3D_MODEL,lesson_helper.handle_message(wit.infer_message(data)))}")
 
         elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.INITIATE_LESSON_REQUEST:
             context_handler_obj.session.state = CONSTANTS.SESSION_STATE_INITIATING_LESSON
-            await websocket.send_text(f"{sendDataToUnity(CONSTANTS.LESSON_INIT_INFO,lesson_helper.sendLesson(json_data[CONSTANTS.DATA_VALUE]))}")
+            await websocket.send_text(f"{sendDataToUnity(CONSTANTS.LESSON_INIT_INFO,lesson_generator.sendLesson(json_data[CONSTANTS.DATA_VALUE]))}")
             context_handler_obj.session.state = CONSTANTS.SESSION_STATE_LESSON_INITIATED
         elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.BUTTON_PRESSED:
             print(json_data[CONSTANTS.DATA_TYPE], json_data[CONSTANTS.DATA_VALUE])
+        elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.SET_USER_PREFERENCES:
+            context_handler_obj.user_preferences.
         else:
             pass
 
