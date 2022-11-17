@@ -37,7 +37,7 @@ from api.norfair_utilities import Detection, Paths, Tracker, Video
 from norfair.distances import frobenius, iou
 import Constants.Values
 
-#from zed import zed_sensor_connection
+from zed import zed_sensor_connection
 
 import context_handler
 import lesson_helper
@@ -48,11 +48,11 @@ from fastapi import WebSocket
 
 
 # Init hololens connection
-connection_manager = hololens_sensor_connection.HololensConnectionManager(
-    show_stream=False)
+# connection_manager = hololens_sensor_connection.HololensConnectionManager(
+#     show_stream=False)
 
-# connection_manager = zed_sensor_connection.ZedConnectionManager(
-#         show_stream=False)
+connection_manager = zed_sensor_connection.ZedConnectionManager(
+    show_stream=False)
 
 context_handler_obj = context_handler.context(
     sensor_connection_manager=connection_manager)

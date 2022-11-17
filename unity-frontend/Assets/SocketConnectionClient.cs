@@ -69,7 +69,7 @@ public class SocketConnectionClient : MonoBehaviour
     void Start()
     {
         //TODO: check the Uri if Valid.
-        var uri = new Uri(Constants.SOCKET_URL);
+        var uri = new Uri(Constants.SOCKET_IO_URL);
         socket = new SocketIOUnity(uri, new SocketIOOptions
         {
             Path = "/ws/socket.io",

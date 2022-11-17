@@ -39,14 +39,7 @@ public class LessonState : MonoBehaviour
 
 
 
-        scaleMap = new Dictionary<string, float>(){
-        {"cylinder",   0.1f},
-        {"plant_cell",   0.1f},
-        {"moon",   0.0005f},
-        {"earth", 0.1f},
-        {"mars",   0.2f},
-        {"saturn",  0.0001f}
-        };
+
     }
 
     // private void OnButtonEnabled(SelectEnterEventArgs arg0)
@@ -102,6 +95,10 @@ public class LessonState : MonoBehaviour
         empty.AddComponent<BoundsControl>();
         empty.AddComponent<ObjectManipulator>();
         empty.AddComponent<ConstraintManager>();
+        Vector3 forwardPosition = Camera.main.transform.rotation * Vector3.forward;
+        Vector3 finalPosition = Camera.main.transform.position + 0.8f * forwardPosition;
+        empty.transform.position = finalPosition;
+
     }
 
 

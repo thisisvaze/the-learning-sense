@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Constants : MonoBehaviour
 {
-    public static string SOCKET_URL = "http://192.168.0.117:8000";
+    public static string SOCKET_IO_URL = "http://192.168.0.117:8000";
+    public static string WEB_SOCKET_URL = "ws://192.168.0.117:8000/ws";
     public static string ENVIRONMENT_OJBECTS_UPDATE = "ENVIRONMENT_OJBECTS_UPDATE";
     public static string SESSION_STATE_LAUNCH = "SESSION_STATE_LAUNCH";
     public static string SESSION_STATE_EXPLORE = "SESSION_STATE_EXPLORE";
@@ -20,17 +21,18 @@ public class Constants : MonoBehaviour
     public static string SHOW_3D_MODEL = "SHOW_3D_MODEL";
     public static string DATA_TYPE = "DATA_TYPE";
 
+
     public static string DATA_VALUE = "DATA_VALUE";
     public static string BUTTON_PRESSED = "BUTTON_PRESSED";
-    // Start is called before the first frame update
-    void Start()
-    {
 
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
+    public static Dictionary<string, float> scaleMap = new Dictionary<string, float>(){
+        {"cylinder",   0.1f},
+        {"plant_cell",   0.1f},
+        {"moon",   0.0005f},
+        {"earth", 0.1f},
+        {"mars",   0.2f},
+        {"saturn",  0.0001f}
+        };
 
-    }
 }
