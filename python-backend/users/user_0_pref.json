@@ -1,6 +1,3 @@
-{ "data":[
-    {
-        "subject":"math",
-        "topic_of_interest":"volume"
-    }
-]}
+{ "subject":"mathematics",
+ "topic_of_interest":"volume"
+}

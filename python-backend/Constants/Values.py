@@ -32,8 +32,16 @@ LESSON_INIT_INFO = "LESSON_INIT_INFO"
 SPEECH_SENTENCE_SPOKEN = "SPEECH_SENTENCE_SPOKEN"
 BUTTON_PRESSED = "BUTTON_PRESSED"
 REQUEST_ENV_INFO_UPDATE = "REQUEST_ENV_INFO_UPDATE"
-SHOW_3D_MODEL="SHOW_3D_MODEL"
+SHOW_3D_MODEL = "SHOW_3D_MODEL"
+SET_USER_PREFERENCES = "SET_USER_PREFERENCES"
 # Zed mini and Hololens 2 Alignment
 DELTA_X = 0.3
 DELTA_Y = 0.2
 DELTA_Z = -0.5
+
+
+# VOICE WIT INTENTS
+load_3d_model = "load_3d_model"
+modify_user_preferences = "modify_user_preferences"
+descriptive_query = "descriptive_query"
+fact_query = "fact_query"

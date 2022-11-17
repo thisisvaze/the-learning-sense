@@ -25,20 +25,19 @@ def openai_text_output(query):
     return response.choices[0].text
 
 
-def fact_generator(topic, image):
-    data = multiple_object_detection.facebook_resnet_localize_objects(image)
-    print(data)
+def fact_generator(topic, object_name):
+    print("generating a " + topic + " fact for " + object_name)
     min_distance_x = 1
     min_distance_object_label = ""
-    for object in data:
-        print(object)
-        if (abs(object["x"]-0.5) < min_distance_x):
-            min_distance_object_label = object["name"]
+    # for object in data:
+    #     print(object)
+    #     if (abs(object["x"]-0.5) < min_distance_x):
+    #         min_distance_object_label = object["name"]
     response = openai.Completion.create(
         model="text-curie-001",
         # prompt="tell me a fact about"+min_distance_object_label +
         #"that teaches me " + topic,
-        prompt="tell me a" + topic + " concept which is about a "+min_distance_object_label,
+        prompt="tell me a" + topic + " concept which is about a "+object_name,
         temperature=0.7,
         max_tokens=256,
         top_p=1,

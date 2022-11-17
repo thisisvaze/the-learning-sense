@@ -12,10 +12,6 @@ import Constants.Values as CONSTANTS
 from api.norfair_utilities import Detection, Paths, Tracker, Video
 from norfair.distances import frobenius, iou
 import norfair
-import deepl
-
-auth_key = "f63c02c5-f056-..."  # Replace with your key
-translator = deepl.Translator(auth_key)
 
 DISTANCE_THRESHOLD_BBOX: float = 2
 DISTANCE_THRESHOLD_CENTROID: int = 30
