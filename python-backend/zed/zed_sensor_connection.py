@@ -129,15 +129,13 @@ class VideoStream():
 
         # Create a ZED camera object
         self.zed = sl.Camera()
-
-        # Set configuration parameters
-        # if len(sys.argv) >= 2:
+        input_type = sl.InputType()
+        # if len(sys.argv) >= 2 :
         #     input_type.set_from_svo_file(sys.argv[1])
-        init = sl.InitParameters()
-        init.camera_resolution = sl.RESOLUTION.HD720
+        init = sl.InitParameters(input_t=input_type)
+        init.camera_resolution = sl.RESOLUTION.HD1080
         init.depth_mode = sl.DEPTH_MODE.PERFORMANCE
         init.coordinate_units = sl.UNIT.METER
-        init.depth_stabilization = False
 
         # Open the camera
         err = self.zed.open(init)
@@ -165,14 +163,13 @@ class VideoStream():
         #     self.image_size.width, self.image_size.height, sl.MAT_TYPE.U8_C4)
         self.point_cloud = sl.Mat(
             self.image_size.width, self.image_size.height, sl.MAT_TYPE.F32_C4)
-        self.last_updated_point_cloud = sl.Mat(
-            self.image_size.width, self.image_size.height, sl.MAT_TYPE.F32_C4)
+
         self.frame = self.image_zed.get_data()
         # asyncio.get_event_loop().create_task(self.update())
        # Start the thread to read frames from the video stream
-        #self.thread = Thread(target=self.update, args=())
-        #self.thread.daemon = True
-        #self.thread.start()
+        self.thread = Thread(target=self.update, args=())
+        self.thread.daemon = True
+        self.thread.start()
 
     def update(self):
         # Read the next frame from the stream in a different thread
@@ -184,19 +181,16 @@ class VideoStream():
                     self.image_zed, sl.VIEW.LEFT, sl.MEM.CPU, self.image_size)
                 self.zed.retrieve_measure(
                     self.point_cloud, sl.MEASURE.XYZRGBA, sl.MEM.CPU, self.image_size)
-                #self.frame = self.image_zed.get_data()
+                self.frame = self.image_zed.get_data()
                 #self.last_updated_point_cloud = self.point_cloud.copy()
                 #self.last_updated_point_cloud = copy.deepcopy(self.point_cloud)
-                print("zed_sensor_connection:" + str(self.point_cloud))
-                time.sleep(0.5)
+                #print("zed_sensor_connection:" + str(self.point_cloud))
+                self.show_frame()
+                time.sleep(1)
 
     def get_current_frame(self, mode="opencv"):
-        err = self.zed.grab(self.runtime)
-        if err == sl.ERROR_CODE.SUCCESS:
-            self.zed.retrieve_image(
-                self.image_zed, sl.VIEW.LEFT, sl.MEM.CPU, self.image_size)
         if mode == "opencv":
-            return self.image_zed.get_data()
+            return self.frame
         elif mode == "base64":
             retval, buffer = cv2.imencode('.jpg', self.frame)
             jpg_as_text = base64.b64encode(buffer)
@@ -204,11 +198,6 @@ class VideoStream():
             return jpg_as_text
 
     def get_current_point_cloud(self):
-        err = self.zed.grab(self.runtime)
-        if err == sl.ERROR_CODE.SUCCESS:
-            self.zed.retrieve_measure(
-                    self.point_cloud, sl.MEASURE.XYZRGBA, sl.MEM.CPU, self.image_size)
-        # return None
         return self.point_cloud
 
     def show_frame(self):

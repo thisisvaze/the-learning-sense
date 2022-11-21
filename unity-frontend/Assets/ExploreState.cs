@@ -33,6 +33,7 @@ public class ExploreState : MonoBehaviour
     Vector3 zed_reference_position = new Vector3(0, 0, 0);
     public GameObject labelType;
 
+    public float UpdateEnvironmentRate;
     public PressableButton button;
     public GameObject[] markers = new GameObject[40];
 
@@ -57,16 +58,20 @@ public class ExploreState : MonoBehaviour
             markers[i] = (Instantiate(labelType, Camera.main.transform.position - 30f * forwardPosition, Camera.main.transform.rotation) as GameObject);
             markers[i].AddComponent<PressableButton>();
             markers[i].transform.parent = gameObject.transform;
-            markers[i].GetComponentInChildren<PressableButton>().selectEntered.AddListener(OnButtonEnabled);
+            PressableButton b = markers[i].GetComponentInChildren<PressableButton>();
+            b.selectEntered.AddListener(delegate { DoThis(b); });
+
         }
-        InvokeRepeating("GetEnvironmentUpdates", 0.0f, 5f);
+        InvokeRepeating("GetEnvironmentUpdates", 0.0f, UpdateEnvironmentRate);
     }
 
-    private void OnButtonEnabled(SelectEnterEventArgs arg0)
+    private void DoThis(PressableButton b)
     {
-        Debug.Log("Button Clicked" + arg0.ToString());
-        EventManager.TriggerEvent(Constants.BUTTON_PRESSED, arg0.ToString());
-        EventManager.TriggerEvent(Constants.INITIATE_LESSON_REQUEST, "cup");
+
+        Debug.Log("Button Clicked" + b.GetComponentInChildren<TMP_Text>().text);
+
+        EventManager.TriggerEvent(Constants.BUTTON_PRESSED, b.GetComponentInChildren<TMP_Text>().text);
+        EventManager.TriggerEvent(Constants.INITIATE_LESSON_REQUEST, b.GetComponentInChildren<TMP_Text>().text);
     }
 
     void GetEnvironmentUpdates()

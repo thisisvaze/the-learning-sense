@@ -50,7 +50,7 @@ public class InputManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(controllerLookup.LeftHandController.transform.position);
+        //Debug.Log(controllerLookup.LeftHandController.transform.position);
         gltf.transform.localPosition = controllerLookup.GazeController.transform.position + 1.3f * controllerLookup.GazeController.transform.forward;
         // try
         // {

@@ -10,7 +10,6 @@ using System.Net;
 using UnityEngine.Networking;
 using System.Collections;
 using System.Linq;
-using UnityEngine.Windows.WebCam;
 using TMPro;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography;
@@ -80,7 +79,6 @@ public class LessonState : MonoBehaviour
         //gameObject.GetComponentInChildren<TMP_Text>().text = envInfo.name;
     }
 
-
     void Load3DModel(string msg)
     {
         JSONNode message = JSONArray.Parse(msg);
@@ -101,40 +99,42 @@ public class LessonState : MonoBehaviour
 
     }
 
-
     void OnLessonInfoRecieved(String msg)
     {
         JSONNode message = JSONString.Parse(msg);
-        Debug.Log(Constants.DATA_TYPE + message[Constants.DATA_TYPE]);
-        Debug.Log("text" + message[Constants.DATA_VALUE]["text"]);
-        Debug.Log("image" + message[Constants.DATA_VALUE]["image_url"]);
-        JSONNode lesson_object = message[Constants.DATA_VALUE];
+
+        String title = message[Constants.DATA_VALUE]["text"];
+        String image = message[Constants.DATA_VALUE]["image_url"];
+        String model = message[Constants.DATA_VALUE]["3d_model"];
+
+
         Vector3 forwardPosition = Camera.main.transform.rotation * Vector3.forward;
-        Vector3 finalPosition = Camera.main.transform.position + 0.8f * forwardPosition;
-        GetComponentInChildren<TMP_Text>().text = lesson_object["text"];
-        StartCoroutine(RetrieveImageandSetContent(lesson_object["image_url"]));
+        Vector3 finalPosition = Camera.main.transform.position + 1.2f * forwardPosition;
+
+        //text
+        GetComponentInChildren<TMP_Text>().text = title;
+
+        //image
+        StartCoroutine(RetrieveImageandSetContent(image));
         gameObject.transform.position = finalPosition;
-        gameObject.transform.rotation = Camera.main.transform.rotation;
-        // foreach (lesson_objects lesson_object in info[0].lesson_objects)
-        // {
-        //     if (lesson_object.type == "text")
-        //     {
-        //         ;
-        //         //i++;
-        //     }
-        //     if (lesson_object.type == "media")
-        //     {
-        //         Vector3 forwardPosition = Camera.main.transform.rotation * Vector3.forward;
-        //         Vector3 finalPosition = Camera.main.transform.position + new Vector3(float.Parse(lesson_object.info.position.x), float.Parse(lesson_object.info.position.y), float.Parse(lesson_object.info.position.z));
 
-        //     }
-
-
+        //3d model
+        var empty = new GameObject();
+        GLTFast.GltfAsset gltf = empty.AddComponent<GLTFast.GltfAsset>();
+        gltf.url = Application.dataPath + "/Resources/" + model + ".glb";
+        float scale = scaleMap[message[Constants.DATA_VALUE]["3d_model"]];
+        empty.transform.localScale = new Vector3(scale, scale, scale);
+        empty.AddComponent<BoxCollider>();
+        empty.AddComponent<BoundsControl>();
+        empty.AddComponent<ObjectManipulator>();
+        empty.AddComponent<ConstraintManager>();
+        forwardPosition = Camera.main.transform.rotation * Vector3.forward;
+        finalPosition = Camera.main.transform.position + 0.8f * forwardPosition;
+        empty.transform.position = finalPosition;
     }
 
     IEnumerator RetrieveImageandSetContent(string url)
     {
-
         UnityWebRequest req = UnityWebRequestTexture.GetTexture(url);
         yield return req.SendWebRequest();
         if (req.result != UnityWebRequest.Result.Success)
@@ -148,9 +148,6 @@ public class LessonState : MonoBehaviour
             Debug.Log("Image downloaded");
             texture = DownloadHandlerTexture.GetContent(req);
             GetComponentInChildren<RawImage>().texture = texture;
-
-
-            //quadRenderer.material.SetTexture("_MainTex", texture);
         }
     }
 

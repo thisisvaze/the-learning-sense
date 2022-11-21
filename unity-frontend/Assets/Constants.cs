@@ -4,14 +4,15 @@ using UnityEngine;
 
 public class Constants : MonoBehaviour
 {
-    public static string SOCKET_IO_URL = "http://192.168.0.117:8000";
-    public static string WEB_SOCKET_URL = "ws://192.168.0.117:8000/ws";
+
+    public static string WEB_SOCKET_URL = "ws://localhost:8000/ws";
     public static string ENVIRONMENT_OJBECTS_UPDATE = "ENVIRONMENT_OJBECTS_UPDATE";
     public static string SESSION_STATE_LAUNCH = "SESSION_STATE_LAUNCH";
     public static string SESSION_STATE_EXPLORE = "SESSION_STATE_EXPLORE";
     public static string SESSION_STATE_INITIATING_LESSON = "SESSION_STATE_INITIATING_LESSON";
     public static string SESSION_STATE_LESSON_INITIATED = "SESSION_STATE_LESSON_INITIATED";
     public static string SESSION_STATE_DISCONNECTED = "SESSION_STATE_DISCONNECTED";
+    public static string SOCKET_IO_URL = "http://192.168.0.117:8000";
 
     //CLIENT_SERVER PROTOCOL
     public static string REQUEST_ENV_INFO_UPDATE = "REQUEST_ENV_INFO_UPDATE";

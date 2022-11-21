@@ -15,8 +15,23 @@ def initiate_curiousityAndSendToHeadset():
 
 def sendLesson(object):
     print(object)
+    match object:
+        case "cup":
+            return {"text": "What is Pi?",
+                    "image_url": "https://i0.wp.com/team-cartwright.com/wp-content/uploads/2021/02/definition-of-pi-1.png",
+                    "3d_model": "circle"}
+        case "potted plant":
+            return {"text": "Plant Cell",
+                    "image_url": "https://ez002.k12.sd.us/labs/plant.jpg",
+                    "3d_model": "plantcell"}
+        case "chair":
+            return {"text": "Mars",
+                    "image_url": "https://osr.org/wp-content/uploads/2021/01/11-01Instagram-Post-Infographic-1.jpg",
+                    "3d_model": "mars"}
+
     return {"text": "What is Pi?",
-            "image_url": "https://i0.wp.com/team-cartwright.com/wp-content/uploads/2021/02/definition-of-pi-1.png"}
+                    "image_url": "https://i0.wp.com/team-cartwright.com/wp-content/uploads/2021/02/definition-of-pi-1.png",
+                    "3d_model": "circle"}
 
 
 def handle_speech_message(message, context):
