@@ -36,9 +36,9 @@ class VideoStream():
         print(width, height)
         (self.status, self.frame) = self.capture.read()
         # Start the thread to read frames from the video stream
-        self.thread = Thread(target=self.update, args=())
-        self.thread.daemon = True
-        self.thread.start()
+        # self.thread = Thread(target=self.update, args=())
+        # self.thread.daemon = True
+        # self.thread.start()
         if (show_stream):
             while True:
                 if self.capture.isOpened():

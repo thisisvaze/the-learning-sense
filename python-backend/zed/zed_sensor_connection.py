@@ -1,21 +1,13 @@
-import Constants.Values as CONSTANTS
 import cv2
 from threading import Thread
 import base64
 import time
-import sys
 import numpy as np
 import pyzed.sl as sl
 import cv2
-import math
-from api.norfair_utilities import YOLO, yolo_detections_to_norfair_detections, names
-from api.norfair_utilities import Detection, Paths, Tracker, Video
-from norfair.distances import frobenius, iou
-import Constants
 from threading import Thread
 import time
-import asyncio
-import copy
+import sys
 LOG_TAG = "ZED_CONNECTION"
 help_string = "[s] Save side by side image [d] Save Depth, [n] Change Depth format, [p] Save Point Cloud, [m] Change Point Cloud format, [q] Quit"
 prefix_point_cloud = "Cloud_"
@@ -118,22 +110,22 @@ def print_help():
 
 
 class ZedConnectionManager():
-    def __init__(self, show_stream):
+    def __init__(self):
         self.deviceType = "zed"
-        self.videoStream = VideoStream(show_stream, src=0)
+        self.videoStream = VideoStream()
 
 
 class VideoStream():
 
-    def __init__(self, show_stream, src=0):
+    def __init__(self):
 
         # Create a ZED camera object
         self.zed = sl.Camera()
         input_type = sl.InputType()
-        # if len(sys.argv) >= 2 :
+        # if len(sys.argv) >= 2:
         #     input_type.set_from_svo_file(sys.argv[1])
         init = sl.InitParameters(input_t=input_type)
-        init.camera_resolution = sl.RESOLUTION.HD1080
+        init.camera_resolution = sl.RESOLUTION.HD720
         init.depth_mode = sl.DEPTH_MODE.PERFORMANCE
         init.coordinate_units = sl.UNIT.METER
 
@@ -185,7 +177,7 @@ class VideoStream():
                 #self.last_updated_point_cloud = self.point_cloud.copy()
                 #self.last_updated_point_cloud = copy.deepcopy(self.point_cloud)
                 #print("zed_sensor_connection:" + str(self.point_cloud))
-                self.show_frame()
+                # self.show_frame()
                 time.sleep(1)
 
     def get_current_frame(self, mode="opencv"):
@@ -212,3 +204,7 @@ class VideoStream():
             cv2.destroyAllWindows()
             self.zed.close()
             exit(1)
+
+
+if __name__ == "__main__":
+    ZedConnectionManager(show_stream=0)

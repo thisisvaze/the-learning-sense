@@ -51,15 +51,15 @@ from fastapi import WebSocket
 # connection_manager = hololens_sensor_connection.HololensConnectionManager(
 #     show_stream=False)
 
-connection_manager = zed_sensor_connection.ZedConnectionManager(
-    show_stream=False)
-
-context_handler_obj = context_handler.context(
-    sensor_connection_manager=connection_manager)
 
 app = FastAPI()
 sio = SocketManager(app=app)
 wit = message_extraction.wit_utilities()
+
+connection_manager = zed_sensor_connection.ZedConnectionManager()
+
+context_handler_obj = context_handler.context(
+    sensor_connection_manager=connection_manager)
 
 
 def sendDataToUnity(tag, data):

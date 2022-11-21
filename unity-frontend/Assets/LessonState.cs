@@ -29,8 +29,8 @@ using SimpleJSON;
 
 public class LessonState : MonoBehaviour
 {
+    public GameObject BoundsControlPrefab;
     public Texture2D texture = null;
-    Dictionary<string, float> scaleMap = null;
 
     // Start is called before the first frame update
     void Start()
@@ -75,27 +75,43 @@ public class LessonState : MonoBehaviour
         //Debug.Log("Text:"+gameObject.transform.position);
         //Debug.Log("Text:"+gameObject.GetComponentInChildren<TMP_Text>().text);
         //gameObject.transform.position = finalPosition;
-        //gameObject.transform.rotation =  Camera.main.transform.rotation;
+        //
         //gameObject.GetComponentInChildren<TMP_Text>().text = envInfo.name;
     }
 
     void Load3DModel(string msg)
     {
+
         JSONNode message = JSONArray.Parse(msg);
-        Debug.Log("Model name recieved here" + Constants.DATA_TYPE + message[Constants.DATA_TYPE]);
+
         var empty = new GameObject();
-        Debug.Log("Model name recieved here" + message[Constants.DATA_VALUE]);
-        GLTFast.GltfAsset gltf = empty.AddComponent<GLTFast.GltfAsset>();
-        gltf.url = Application.dataPath + "/Resources/" + message[Constants.DATA_VALUE] + ".glb";
-        //gltf.transform.localScale = new Vector3(1f, 1f, 1f);
-        empty.transform.localScale = new Vector3(scaleMap[message[Constants.DATA_VALUE]], scaleMap[message[Constants.DATA_VALUE]], scaleMap[message[Constants.DATA_VALUE]]);
-        empty.AddComponent<BoxCollider>();
-        empty.AddComponent<BoundsControl>();
-        empty.AddComponent<ObjectManipulator>();
-        empty.AddComponent<ConstraintManager>();
+
+        //float s = Constants.scaleMap[message[Constants.DATA_VALUE]];
+
+        //GLTFast.GltfAsset gltf = empty.AddComponent<GLTFast.GltfAsset>();
+        //gltf.url = Application.dataPath + "/Resources/" + message[Constants.DATA_VALUE] + ".glb";
+        //empty.transform.position = new Vector3(0, 0, 0);
+        //empty.transform.localScale = new Vector3(s, s, s);
+        //BoxCollider boxCollider = empty.AddComponent<BoxCollider>();
+        //empty.AddComponent<MeshFilter>();
+        //boxCollider.size = new Vector3(1800 * s, 1800 * s, 1800 * s);
+        //gltf.transform.localScale = new Vector3(s, s, s);
+
+        //BoundsControl boundscontrol = empty.AddComponent<BoundsControl>();
+        // boundscontrol.BoundsVisualsPrefab = (GameObject)Resources.Load("prefabs/BoundingBox", typeof(GameObject));
+        //empty.AddComponent<ObjectManipulator>();
+        //empty.AddComponent<ConstraintManager>();
         Vector3 forwardPosition = Camera.main.transform.rotation * Vector3.forward;
         Vector3 finalPosition = Camera.main.transform.position + 0.8f * forwardPosition;
-        empty.transform.position = finalPosition;
+
+
+        Debug.Log("Model name recieved here" + Constants.DATA_TYPE + message[Constants.DATA_TYPE]);
+        var bounds = Instantiate(BoundsControlPrefab, finalPosition, Camera.main.transform.rotation);
+        bounds.GetComponentInChildren<GLTFast.GltfAsset>().url = Application.dataPath + "/Resources/" + message[Constants.DATA_VALUE] + ".glb";
+        Debug.Log("Model name recieved here" + message[Constants.DATA_VALUE]);
+        //empty.transform.SetParent(bounds.transform);
+        //bounds.transform.position = finalPosition;
+
 
     }
 
@@ -116,13 +132,14 @@ public class LessonState : MonoBehaviour
 
         //image
         StartCoroutine(RetrieveImageandSetContent(image));
+        finalPosition = finalPosition + new Vector3(-0.1f, 0.1f, 0);
         gameObject.transform.position = finalPosition;
-
+        gameObject.transform.rotation = Camera.main.transform.rotation;
         //3d model
         var empty = new GameObject();
         GLTFast.GltfAsset gltf = empty.AddComponent<GLTFast.GltfAsset>();
         gltf.url = Application.dataPath + "/Resources/" + model + ".glb";
-        float scale = scaleMap[message[Constants.DATA_VALUE]["3d_model"]];
+        float scale = Constants.scaleMap[message[Constants.DATA_VALUE]["3d_model"]];
         empty.transform.localScale = new Vector3(scale, scale, scale);
         empty.AddComponent<BoxCollider>();
         empty.AddComponent<BoundsControl>();
