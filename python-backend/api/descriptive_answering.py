@@ -4,7 +4,6 @@ import openai
 import json
 import requests
 import urllib.parse
-from . import draw, multiple_object_detection
 OPENAI_API_KEY = "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"
 openai.api_key = OPENAI_API_KEY
 
@@ -49,7 +48,9 @@ def fact_generator(topic, object_name):
 
 def wolram_results(query):
     URL_ENCODED_INPUT = urllib.parse.quote_plus(query)
-    API_URL = "http://api.wolframalpha.com/v1/result?appid={WOLFRAM_API_KEY}&i={URL_ENCODED_INPUT}"
+    API_URL = "https://api.wolframalpha.com/v1/result?appid=" + \
+        WOLFRAM_API_KEY+"&i="+URL_ENCODED_INPUT
+    print("sending this request,"+API_URL)
     response = requests.request("GET", API_URL)
     print(response.text)
     return response.text
@@ -57,14 +58,25 @@ def wolram_results(query):
 
 async def get_wolfram_results_async(session, query):
     URL_ENCODED_INPUT = urllib.parse.quote_plus(query)
-    API_URL = "http://api.wolframalpha.com/v1/result?appid={WOLFRAM_API_KEY}&i={URL_ENCODED_INPUT}"
+    API_URL = "https://api.wolframalpha.com/v1/result?appid=" + \
+        WOLFRAM_API_KEY+"&i="+URL_ENCODED_INPUT
     async with session.get(API_URL) as response:
         return await response.text()
 
 
 def wolram_spoken_results(query):
     URL_ENCODED_INPUT = urllib.parse.quote_plus(query)
-    API_URL = "http://api.wolframalpha.com/v1/result?appid={WOLFRAM_API_KEY}&i={URL_ENCODED_INPUT}"
+    API_URL = "https://api.wolframalpha.com/v1/result?appid=" + \
+        WOLFRAM_API_KEY+"&i="+URL_ENCODED_INPUT
     response = requests.request("GET", API_URL)
     print(response.text)
     return response.text
+
+
+def main():
+    #test wolfram if it works
+    wolram_results("what is the radius of earth")
+
+
+if __name__ == "__main__":
+    main()
