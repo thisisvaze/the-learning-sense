@@ -53,7 +53,7 @@ from fastapi import WebSocket
 
 
 app = FastAPI()
-sio = SocketManager(app=app)
+#sio = SocketManager(app=app)
 wit = message_extraction.wit_utilities()
 
 connection_manager = zed_sensor_connection.ZedConnectionManager()
@@ -76,9 +76,12 @@ async def websocket_endpoint(websocket: WebSocket):
         print(data)
         json_data = json.loads(data)
         if json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.REQUEST_ENV_INFO_UPDATE:
-            data = {"Items": context_handler_obj.env_context.getDefaultParameters()}
+            data = {"Items": lesson_helper.modifylessontags(context_handler_obj.user_preferences.data,
+                                                            context_handler_obj.env_context.getDefaultParameters())}
             await websocket.send_text(f"{sendDataToUnity(CONSTANTS.ENVIRONMENT_OJBECTS_UPDATE, data)}")
 
+        elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.GAZE_INPUT:
+            context_handler_obj.gaze_position = data
         elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.SPEECH_SENTENCE_SPOKEN:
             # and context_handler_obj.session.state == CONSTANTS.SESSION_STATE_LESSON_INITIATED:
             data = lesson_helper.handle_speech_message(
@@ -97,6 +100,9 @@ async def websocket_endpoint(websocket: WebSocket):
         elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.SET_USER_PREFERENCES:
             context_handler_obj.user_preferences.set(
                 json_data[CONSTANTS.DATA_VALUE])
+
+        elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.MARS_MOVED_UPDATE_POSITION:
+            await websocket.send_text(f"{data}")
         else:
             pass
 

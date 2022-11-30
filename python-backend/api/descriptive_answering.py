@@ -73,9 +73,28 @@ def wolram_spoken_results(query):
     return response.text
 
 
+def wolfram_summary_boxes(query):
+    URL_ENCODED_INPUT = urllib.parse.quote_plus(query)
+    API_URL = "http://www.wolframalpha.com/queryrecognizer/query.jsp?appid=DEMO" + \
+        "&mode=Default"+"&i="+URL_ENCODED_INPUT+"&output=json"
+    # WOLFRAM_API_KEY+
+
+    response = requests.request("GET", API_URL)
+    res = response.json()["query"][0]["summarybox"]["path"]
+    print(res)
+    API_URL = "http://www.wolframalpha.com/summaryboxes/v1/query?appid=" + \
+        WOLFRAM_API_KEY + "&path="+res
+    # WOLFRAM_API_KEY+
+
+    response2 = requests.request("GET", API_URL)
+
+    print(response2.text)
+    return response2.text
+
+
 def main():
-    #test wolfram if it works
-    wolram_results("what is the radius of earth")
+    # test wolfram if it works
+    wolram_spoken_results("earth")
 
 
 if __name__ == "__main__":

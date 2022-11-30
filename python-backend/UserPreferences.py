@@ -9,3 +9,12 @@ class Preferences():
 
     def set(self, data):
         self.data = data
+
+
+def main():
+    pref = Preferences(1)
+    print(pref.data["subject"])
+
+
+if __name__ == "__main__":
+    main()

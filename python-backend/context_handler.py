@@ -37,13 +37,13 @@ class context():
         self.session = session()
         self.sensor_connection_manager = sensor_connection_manager
         self.env_context = env_context(self.sensor_connection_manager)
-        self.user_preferences = Preferences()
+        self.user_preferences = Preferences(user_id=1)
         self.session.state = CONSTANTS.SESSION_STATE_EXPLORE
+        self.gaze_position = None
 
 
 class env_context():
     def __init__(self, sensor_connection_manager):
-        self.user_preferences = Preferences()
         self.obj_detection_manager = multiple_object_detection.norfair_yolo_detection()
         self.sensor_connection_manager = sensor_connection_manager
 
@@ -63,7 +63,8 @@ class env_context():
         return self.obj_detection_manager.trackMultipleObjects(
             frame=self.sensor_connection_manager.videoStream.get_current_frame(),
             sensor=self.sensor_connection_manager.deviceType,
-            pointcloud=self.sensor_connection_manager.videoStream.get_current_point_cloud()
+            pointcloud=self.sensor_connection_manager.videoStream.get_current_point_cloud(),
+            language="French"
             # ,depth = self.sensor_connection_manager.videoStream.depth_image_zed
 
         )

@@ -1,6 +1,6 @@
 import json
 import Constants.Values as CONSTANTS
-from api import descriptive_answering
+from api import descriptive_answering, text_to_speech
 
 
 def initiate_curiousityAndSendToHeadset():
@@ -13,6 +13,34 @@ def initiate_curiousityAndSendToHeadset():
         return json.dumps(lesson_object)
 
 
+def modifylessontags(user_pref, data):
+    match user_pref["topic_of_interest"]:
+        case "plants":
+            for object in data:
+                if object["name"] == "potted plant":
+                    object["name"] = "What is a plant cell?"
+                else:
+                    object["visibility"] = 0
+
+            return data
+
+        case "surface area":
+            for object in data:
+                if object["name"] == "cup" or object["name"] == "mug":
+                    object["name"] = "How to measure the surface area of this " + \
+                        object["name"] + "?"
+                else:
+                    object["visibility"] = 0
+            return data
+
+    return data
+
+def sendSpeechToUnity(query):
+    spoken_results = descriptive_answering.wolram_spoken_results(query)
+    tts = text_to_speech.tts_fairseq()
+    tts.predict(spoken_results)
+
+
 def sendLesson(object):
     print(object)
     match object:
@@ -20,10 +48,10 @@ def sendLesson(object):
             return {"text": "What is Pi?",
                     "image_url": "https://i0.wp.com/team-cartwright.com/wp-content/uploads/2021/02/definition-of-pi-1.png",
                     "3d_model": "circle"}
-        case "potted plant":
+        case "What is a plant cell?":
             return {"text": "Plant Cell",
                     "image_url": "https://ez002.k12.sd.us/labs/plant.jpg",
-                    "3d_model": "plantcell"}
+                    "3d_model": "plantcell1"}
         case "chair":
             return {"text": "Mars",
                     "image_url": "https://osr.org/wp-content/uploads/2021/01/11-01Instagram-Post-Infographic-1.jpg",
@@ -73,3 +101,10 @@ def handle_speech_message(message, context):
 
 
 # def generate_final_send_to_headset():
+
+
+def main():
+    sendSpeechToUnity("how far is earth from sun?")
+
+if __name__ == "__main__":
+    main()

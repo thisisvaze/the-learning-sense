@@ -1,4 +1,4 @@
-from translate import Translator
+from googletrans import Translator
 lang_codes = [('ab', 'Abkhaz'),
               ('aa', 'Afar'),
               ('af', 'Afrikaans'),
@@ -186,16 +186,20 @@ lang_codes = [('ab', 'Abkhaz'),
 
 
 class translation():
-    def __init__(self, language):
-        code = list(lang_codes.keys())[
-            list(lang_codes.values()).index(language)]
-        self.translator = Translator(to_lang="fr")
+    def __init__(self):
+        self.translator = Translator()
 
-    def translate(self, text):
-        translation = self.translator.translate(text)
-        return translation
+    def thisText(self, text, language):
+        for key, value in lang_codes:
+            if value == language:
+                return self.translator.translate(text, dest=key).text
+        return "no translation found"
 
-    def changeLanguage(self, newLanguage):
-        code = list(lang_codes.keys())[
-            list(lang_codes.values()).index(newLanguage)]
-        self.translator = Translator(to_lang=code)
+
+def main():
+    transla = Translator()
+    print(transla.translate('apple', dest='fr').text)
+
+
+if __name__ == "__main__":
+    main()

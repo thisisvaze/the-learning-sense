@@ -3,30 +3,38 @@ using System.Collections.Generic;
 using UnityEngine;
 using NativeWebSocket;
 using SimpleJSON;
-using System.Text.Json;
+using Newtonsoft.Json;
+using TMPro;
 public class WebSocketConnectionClient : MonoBehaviour
 {
     public string LOG = "WebSocketConnectionClient";
     WebSocket websocket;
 
+    TMP_Text loggerText;
     // Start is called before the first frame update
     async void Start()
     {
+
         websocket = new WebSocket(Constants.WEB_SOCKET_URL);
+        //loggerText = GameObject.Find("Logger").GetComponentInChildren<TMP_Text>();
 
         websocket.OnOpen += () =>
         {
             Debug.Log("Connection open!");
+
+            //loggerText.text += "Connection open!";
         };
 
         websocket.OnError += (e) =>
         {
             Debug.Log("Error! " + e);
+            //loggerText.text += "Error! " + e;
         };
 
         websocket.OnClose += (e) =>
         {
             Debug.Log("Connection closed!");
+            //loggerText.text += "Connection closed!";
         };
 
         websocket.OnMessage += (bytes) =>
@@ -35,6 +43,7 @@ public class WebSocketConnectionClient : MonoBehaviour
             var message = System.Text.Encoding.UTF8.GetString(bytes);
             message = message.Replace("'", "\"");
             Debug.Log("Message:" + message);
+            // loggerText.text += "message: " + message;
             JSONNode jsonResponse = JSONArray.Parse(message);
             Debug.Log(Constants.DATA_TYPE + jsonResponse[Constants.DATA_TYPE]);
             EventManager.TriggerEvent(jsonResponse[Constants.DATA_TYPE], message);
@@ -89,16 +98,17 @@ public class WebSocketConnectionClient : MonoBehaviour
         Dictionary<string, string> dict = new Dictionary<string, string>();
         dict.Add(Constants.DATA_TYPE, Constants.INITIATE_LESSON_REQUEST);
         dict.Add(Constants.DATA_VALUE, message);
-        string send_this = JsonSerializer.Serialize(dict);
+        string send_this = JsonConvert.SerializeObject(dict);
         SendWebSocketMessage(send_this);
     }
     private void OnEnvironmentInfoRequested(string message)
     {
+        // loggerText.text += (LOG + " Sending  " + message + "to server");
         Debug.Log(LOG + " Sending  " + message + "to server");
         Dictionary<string, string> dict = new Dictionary<string, string>();
         dict.Add(Constants.DATA_TYPE, Constants.REQUEST_ENV_INFO_UPDATE);
         dict.Add(Constants.DATA_VALUE, message);
-        string send_this = JsonSerializer.Serialize(dict);
+        string send_this = JsonConvert.SerializeObject(dict);
         SendWebSocketMessage(send_this);
     }
     private void OnSentenceSpoken(string message)
@@ -107,7 +117,7 @@ public class WebSocketConnectionClient : MonoBehaviour
         Dictionary<string, string> dict = new Dictionary<string, string>();
         dict.Add(Constants.DATA_TYPE, Constants.SPEECH_SENTENCE_SPOKEN);
         dict.Add(Constants.DATA_VALUE, message);
-        string send_this = JsonSerializer.Serialize(dict);
+        string send_this = JsonConvert.SerializeObject(dict);
         SendWebSocketMessage(send_this);
     }
 
@@ -117,7 +127,7 @@ public class WebSocketConnectionClient : MonoBehaviour
         Dictionary<string, string> dict = new Dictionary<string, string>();
         dict.Add(Constants.DATA_TYPE, Constants.BUTTON_PRESSED);
         dict.Add(Constants.DATA_VALUE, message);
-        string send_this = JsonSerializer.Serialize(dict);
+        string send_this = JsonConvert.SerializeObject(dict);
         SendWebSocketMessage(send_this);
     }
 }

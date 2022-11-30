@@ -15,15 +15,24 @@ class tts_fairseq:
 
     def predict(self, text="The earth is approximately 900 kilometers from the sun."):
         #sample["speaker"] = sample["speaker"].cuda()
-        sample = TTSHubInterface.get_model_input(task, text)
+        sample = TTSHubInterface.get_model_input(self.task, text)
         sample["net_input"]["src_tokens"] = sample["net_input"]["src_tokens"].to(
             "cuda:0")
         sample["net_input"]["src_lengths"] = sample["net_input"]["src_lengths"].to(
             "cuda:0")
         wav, rate = TTSHubInterface.get_prediction(
-            self.task, self.models[0].cuda(), self.generator, self.sample)
+            self.task, self.models[0].cuda(), self.generator, sample)
         ipd.Audio(wav.cpu(), rate=rate)
         sf.write("a.wav", wav.cpu(), rate)
         with open("a.wav", "rb") as f:
             s = base64.b64encode(f.read())
             return s
+
+
+def main(text):
+    tts = tts_fairseq()
+    tts.predict(text)
+
+
+if __name__ == "__main__":
+    main("what is this called in french?")

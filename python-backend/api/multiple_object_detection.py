@@ -12,7 +12,7 @@ import Constants.Values as CONSTANTS
 from api.norfair_utilities import Detection, Paths, Tracker, Video
 from norfair.distances import frobenius, iou
 import norfair
-
+import api.translate_text as lang_translator
 DISTANCE_THRESHOLD_BBOX: float = 2
 DISTANCE_THRESHOLD_CENTROID: int = 30
 MAX_DISTANCE: int = 10000
@@ -30,11 +30,16 @@ class norfair_yolo_detection(object):
         )
         self.tracker = Tracker(
             distance_function=distance_function,
-            distance_threshold=distance_threshold,
-            hit_counter_max=100
+            distance_threshold=distance_threshold
+            # hit_counter_max=100
         )
 
-    def trackMultipleObjects(self, frame, sensor, pointcloud=None):
+    def trackMultipleObjects(self, frame, sensor, pointcloud=None, language="English", gaze_coordinates={"x": 0, "y": 0}):
+        try:
+            translator_utility = lang_translator.translation()
+        except:
+            language = "English"
+
         # (status, frame) = capture.read()
         yolo_detections = self.model(
             frame,
@@ -60,7 +65,8 @@ class norfair_yolo_detection(object):
                 frame, tracked_objects, draw_labels=True)
         if sensor == "hololens":
             returnString = []
-            for det in detections:
+            for tracked_object in tracked_objects:
+                det = tracked_object.last_detection
                 # print(det.points)
                 factor = 0.8
                 # z_index = (500*500)/int((int(det.points[1][0]-det.points[0][0])) *
@@ -70,13 +76,18 @@ class norfair_yolo_detection(object):
 
                 #result = translator.translate_text("Hello, world!", target_lang="FR")
                 # print(result.text)  # "Bonjour, le monde !"
-                returnString.append(
-                    {"name": det.label, "x": ((det.points[0][0]/216)-1)*factor, "y": (1-(det.points[0][1]/120))*0.5})
+                if language == "English":
+                    returnString.append(
+                        {"id": tracked_object.id, "name": det.label, "x": ((det.points[0][0]/216)-1)*factor, "y": (1-(det.points[0][1]/120))*0.5, "visibility": 1})
+                else:
+                    returnString.append(
+                        {"id": tracked_object.id, "name": translator_utility.thisText(det.label, language), "x": ((det.points[0][0]/216)-1)*factor, "y": (1-(det.points[0][1]/120))*0.5, "visibility": 1})
 
         if sensor == "zed":
             returnString = []
             try:
-                for det in detections:
+                for tracked_object in tracked_objects:
+                    det = tracked_object.last_detection
                     x1 = int(det.points[0][0])
                     x2 = int(det.points[1][0])
                     y1 = int(det.points[0][1])
@@ -85,8 +96,14 @@ class norfair_yolo_detection(object):
                     # print(point3D)
                     round_off_param = 2
                     #returnString.append({"name": det.label})
-                    returnString.append(
-                        {"name": det.label, "x": -round(point3D[1][0], round_off_param), "y": -round(point3D[1][1], round_off_param),  "z": -round(point3D[1][2], round_off_param)})
+                    if language == "English":
+                        returnString.append(
+                            {"id": tracked_object.id, "name": det.label, "x": -round(point3D[1][0], round_off_param), "y": -round(point3D[1][1], round_off_param),  "z": -round(point3D[1][2], round_off_param), "visibility": 1})
+
+                    else:
+                        returnString.append(
+                            {"id": tracked_object.id, "name": translator_utility.thisText(det.label, language), "x": -round(point3D[1][0], round_off_param), "y": -round(point3D[1][1], round_off_param),  "z": -round(point3D[1][2], round_off_param), "visibility": 1})
+
             except:
                 returnString.append(
                     {"name": "lost track"})
