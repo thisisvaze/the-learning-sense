@@ -19,39 +19,33 @@ class VideoStream():
 
     def __init__(self, show_stream, src=0):
         url = CONSTANTS.HOLOLENS_URL + \
-            '/api/holographic/stream/live_low.mp4?holo=false&pv=true&mic=true&loopback=true&vstab=false&vstabbuffer=0'
+            '/api/holographic/stream/live_low.mp4?holo=false&pv=true&mic=false&loopback=true&vstab=false&vstabbuffer=0'
         # r = requests.get(url, stream=True)
 
         # Using Hololens 2 camera
-        #self.capture = cv2.VideoCapture(url)
+        self.capture = cv2.VideoCapture(url)
 
         # Test with laptop's internal came
         # ra
-        self.capture = cv2.VideoCapture(0)
+        #self.capture = cv2.VideoCapture(0)
 
-        #self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 300)
-        #self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 400)
+        self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 428)
+        self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
         width = self.capture.get(cv2.CAP_PROP_FRAME_WIDTH)
         height = self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT)
         print(width, height)
         (self.status, self.frame) = self.capture.read()
         # Start the thread to read frames from the video stream
-        # self.thread = Thread(target=self.update, args=())
-        # self.thread.daemon = True
-        # self.thread.start()
-        if (show_stream):
-            while True:
-                if self.capture.isOpened():
-                    (self.status, self.frame) = self.capture.read()
-                    self.show_stream()
-                    break
+        self.thread = Thread(target=self.update, args=())
+        self.thread.daemon = True
+        self.thread.start()
 
     def update(self):
         # Read the next frame from the stream in a different thread
         while True:
             if self.capture.isOpened():
                 (self.status, self.frame) = self.capture.read()
-            time.sleep(.01)
+            time.sleep(.05)
 
     def show_frame(self):
         # Display frames in main program

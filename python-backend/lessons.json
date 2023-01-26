@@ -1,0 +1,27 @@
+[
+    {
+        
+        "objects":["cup", "mug","wine glass"],
+        "lesson": {
+            "template":"TITLE_DESCRIPTION_IMAGE_MODEL",
+            "id": "1",
+            "lesson_curiosity_text": "How to measure the volume of this cup?",
+            "title": "Volume of a Cylinder",
+            "image_url": "https://www.studygate.com/blog/wp-content/uploads/2017/12/cylinder-volume-formula.png",
+            "3d_model": "Cylinder"
+        }
+    },
+    {
+        
+        "objects":["potted plant"],
+        "lesson": {
+            "template":"TITLE_IMAGE_MODEL",
+            "lesson_id": "2",
+            "lesson_curiosity_text": "What is a plant cell?",
+            "title": "Plant cell",
+            "image_url": "https://ez002.k12.sd.us/labs/plant.jpg",
+            "3d_model": "plant_cell"
+        }
+    }
+    
+]

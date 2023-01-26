@@ -38,7 +38,7 @@ from norfair.distances import frobenius, iou
 import Constants.Values
 
 from zed import zed_sensor_connection
-
+import lesson_helper
 import context_handler
 import lesson_helper
 import requests
@@ -47,19 +47,20 @@ import uvicorn
 from fastapi import WebSocket
 
 
-# Init hololens connection
-# connection_manager = hololens_sensor_connection.HololensConnectionManager(
-#     show_stream=False)
-
-
 app = FastAPI()
 #sio = SocketManager(app=app)
 wit = message_extraction.wit_utilities()
 
-connection_manager = zed_sensor_connection.ZedConnectionManager()
+
+# Init hololens connection
+connection_manager = hololens_sensor_connection.HololensConnectionManager(
+    show_stream=False)
+#connection_manager = zed_sensor_connection.ZedConnectionManager()
 
 context_handler_obj = context_handler.context(
     sensor_connection_manager=connection_manager)
+
+lesson_manager = lesson_helper.lesson_helper_object()
 
 
 def sendDataToUnity(tag, data):
@@ -75,23 +76,27 @@ async def websocket_endpoint(websocket: WebSocket):
         data = await websocket.receive_text()
         print(data)
         json_data = json.loads(data)
-        if json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.REQUEST_ENV_INFO_UPDATE:
-            data = {"Items": lesson_helper.modifylessontags(context_handler_obj.user_preferences.data,
-                                                            context_handler_obj.env_context.getDefaultParameters())}
+        if json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.INITIATE_LESSON_REQUEST:
+            context_handler_obj.session.state = CONSTANTS.SESSION_STATE_INITIATING_LESSON
+            await websocket.send_text(f"{sendDataToUnity(CONSTANTS.LESSON_INIT_INFO,lesson_manager.sendLesson(json_data[CONSTANTS.DATA_VALUE]))}")
+            context_handler_obj.session.state = CONSTANTS.SESSION_STATE_LESSON_INITIATED
+
+        elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.REQUEST_ENV_INFO_UPDATE:
+            # data = {"Items": lesson_helper.modifylessontags(context_handler_obj.user_preferences.data,
+            # context_handler_obj.env_context.getDefaultParameters(context_handler_obj.gaze_position))}
+            # await websocket.send_text(f"{sendDataToUnity(CONSTANTS.ENVIRONMENT_OJBECTS_UPDATE, data)}")
+
+            data = {"Items": lesson_manager.sendEnvUpdateWithCuriosity(context_handler_obj.user_preferences.data,
+                                                                       context_handler_obj.env_context.getDefaultParameters(context_handler_obj.gaze_position))}
             await websocket.send_text(f"{sendDataToUnity(CONSTANTS.ENVIRONMENT_OJBECTS_UPDATE, data)}")
 
         elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.GAZE_INPUT:
-            context_handler_obj.gaze_position = data
+            context_handler_obj.gaze_position = json_data[CONSTANTS.DATA_VALUE]
         elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.SPEECH_SENTENCE_SPOKEN:
             # and context_handler_obj.session.state == CONSTANTS.SESSION_STATE_LESSON_INITIATED:
-            data = lesson_helper.handle_speech_message(
+            data = lesson_manager.handle_speech_message(
                 wit.infer_message(json_data[CONSTANTS.DATA_VALUE]), context_handler_obj)
             await websocket.send_text(f"{data}")
-
-        elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.INITIATE_LESSON_REQUEST:
-            context_handler_obj.session.state = CONSTANTS.SESSION_STATE_INITIATING_LESSON
-            await websocket.send_text(f"{sendDataToUnity(CONSTANTS.LESSON_INIT_INFO,lesson_helper.sendLesson(json_data[CONSTANTS.DATA_VALUE]))}")
-            context_handler_obj.session.state = CONSTANTS.SESSION_STATE_LESSON_INITIATED
 
         elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.BUTTON_PRESSED:
             print(json_data[CONSTANTS.DATA_TYPE],
@@ -100,9 +105,8 @@ async def websocket_endpoint(websocket: WebSocket):
         elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.SET_USER_PREFERENCES:
             context_handler_obj.user_preferences.set(
                 json_data[CONSTANTS.DATA_VALUE])
-
-        elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.MARS_MOVED_UPDATE_POSITION:
-            await websocket.send_text(f"{data}")
+        # elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.MARS_MOVED_UPDATE_POSITION:
+        #     await websocket.send_text(f"{data}")
         else:
             pass
 

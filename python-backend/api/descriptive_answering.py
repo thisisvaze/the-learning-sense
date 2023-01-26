@@ -4,7 +4,10 @@ import openai
 import json
 import requests
 import urllib.parse
-OPENAI_API_KEY = "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"
+from chatgpt_wrapper import ChatGPT
+
+OPENAI_API_KEY_OLD = "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"
+OPENAI_API_KEY = "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"
 openai.api_key = OPENAI_API_KEY
 
 WOLFRAM_API_KEY = "TT3P62-W479LAP7E3"
@@ -14,7 +17,7 @@ def openai_text_output(query):
 
     response = openai.Completion.create(
         model="text-curie-001",
-        prompt=query,
+        prompt=query + " in 16 words",
         temperature=0.7,
         max_tokens=256,
         top_p=1,
@@ -22,6 +25,12 @@ def openai_text_output(query):
         presence_penalty=0
     )
     return response.choices[0].text
+
+
+def chatgpt_response(query, bot):
+
+    response = bot.ask(query)
+    return response  # prints the response from chatGPT
 
 
 def fact_generator(topic, object_name):
@@ -93,8 +102,10 @@ def wolfram_summary_boxes(query):
 
 
 def main():
-    # test wolfram if it works
-    wolram_spoken_results("earth")
+    # test
+    #  wolfram if it works
+
+    print(openai_text_output("what is a plant cell?"))
 
 
 if __name__ == "__main__":

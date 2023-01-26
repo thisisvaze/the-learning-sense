@@ -58,9 +58,9 @@ public class ExploreState : MonoBehaviour
 
         }
         InvokeRepeating("GetEnvironmentUpdates", 0.0f, UpdateEnvironmentRate);
-        GameObject boundstemp = Instantiate(BoundsControlPrefab, new Vector3(-2.12f, 0.24f, -1.57f), Camera.main.transform.rotation);
-        boundstemp.GetComponentInChildren<GLTFast.GltfAsset>().url = Application.dataPath + "/Resources/" + "mars" + ".glb";
-        boundstemp.GetComponentInChildren<GLTFast.GltfAsset>().gameObject.transform.localScale = new Vector3(2f, 2f, 2f);
+        // GameObject boundstemp = Instantiate(BoundsControlPrefab, new Vector3(-2.12f, 0.24f, -1.57f), Camera.main.transform.rotation);
+        // boundstemp.GetComponentInChildren<GLTFast.GltfAsset>().url = Application.dataPath + "/Resources/" + "mars" + ".glb";
+        // boundstemp.GetComponentInChildren<GLTFast.GltfAsset>().gameObject.transform.localScale = new Vector3(2f, 2f, 2f);
     }
 
     private void DoThis(PressableButton b)

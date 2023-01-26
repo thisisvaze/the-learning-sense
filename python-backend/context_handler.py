@@ -36,25 +36,33 @@ class context():
     def __init__(self, sensor_connection_manager):
         self.session = session()
         self.sensor_connection_manager = sensor_connection_manager
-        self.env_context = env_context(self.sensor_connection_manager)
-        self.user_preferences = Preferences(user_id=1)
+        self.env_context = env_context(
+            self.sensor_connection_manager, obj_detection=CONSTANTS.RESNET_LOCAL)
+        self.user_preferences = Preferences(user_id=2)
         self.session.state = CONSTANTS.SESSION_STATE_EXPLORE
         self.gaze_position = None
 
 
 class env_context():
-    def __init__(self, sensor_connection_manager):
-        self.obj_detection_manager = multiple_object_detection.norfair_yolo_detection()
+    def __init__(self, sensor_connection_manager, obj_detection=CONSTANTS.NORFAIR_YOLOV7_LOCAL):
+        match obj_detection:
+            case CONSTANTS.NORFAIR_YOLOV7_LOCAL:
+                self.obj_detection_manager = multiple_object_detection.norfair_yolo_detection()
+            case CONSTANTS.FB_RESNET50_HF:
+                self.obj_detection_manager = multiple_object_detection.fb_resnet_detection_hf()
+            case CONSTANTS.RESNET_LOCAL:
+                self.obj_detection_manager = multiple_object_detection.resnet_local()
         self.sensor_connection_manager = sensor_connection_manager
 
-    def getDefaultParameters(self):
-        self.coordinateData = self.getCoordinatesOfObjectsInEnvironment()
+    def getDefaultParameters(self, gaze_coordinates):
+        self.coordinateData = self.getCoordinatesOfObjectsInEnvironment(
+            gaze_coordinates)
         return self.coordinateData
 
     def getSpecialParameters(self, color=True, material=False):
         return self.getObjectCharactersics(self, color, material)
 
-    def getCoordinatesOfObjectsInEnvironment(self):
+    def getCoordinatesOfObjectsInEnvironment(self, gaze_coordinates):
         # return self.obj_detection_manager.trackMultipleObjects(
         #     frame=self.sensor_connection_manager.videoStream.get_current_frame(),
         #     sensor="hololens",
@@ -64,7 +72,8 @@ class env_context():
             frame=self.sensor_connection_manager.videoStream.get_current_frame(),
             sensor=self.sensor_connection_manager.deviceType,
             pointcloud=self.sensor_connection_manager.videoStream.get_current_point_cloud(),
-            language="French"
+            language="English",
+            gaze_coordinates=gaze_coordinates
             # ,depth = self.sensor_connection_manager.videoStream.depth_image_zed
 
         )

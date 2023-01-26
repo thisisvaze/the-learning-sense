@@ -1,0 +1,135 @@
+[
+    {
+        
+        "objects":["cup", "mug","wine glass"],
+        "lesson": {
+            "template":"TITLE_DESCRIPTION_IMAGE_MODEL",
+            "id": "1",
+            "lesson_curiosity_text": "How to measure the volume of this cup?",
+            "title": "Volume of a Cylinder",
+            "image_url": "https://www.studygate.com/blog/wp-content/uploads/2017/12/cylinder-volume-formula.png",
+            "3d_model": "Cylinder"
+        }
+    },
+    {
+        
+        "objects":["ALL_OBJECTS"],
+        "lesson": {
+            "template":"LABEL_CAPTION",
+            "id": "11",
+            "lesson_curiosity_text": "TRANSLATED_LABEL",
+            "title": "LABEL"
+        }
+    },
+    {
+        
+        "objects":["potted plant"],
+        "lesson": {
+            "template":"TITLE_IMAGE_MODEL",
+            "lesson_id": "2",
+            "lesson_curiosity_text": "What is a plant cell?",
+            "title": "Plant cell",
+            "image_url": "https://ez002.k12.sd.us/labs/plant.jpg",
+            "3d_model": "plant_cell"
+        }
+    },
+    {
+        
+        "objects":["lamp"],
+        "lesson": {
+            "template":"TITLE_IMAGE_MODEL",
+            "lesson_id": "3",
+            "lesson_curiosity_text": "How does this bulb work?",
+            "title": "Light bulb",
+            "image_url": "https://www.scienceabc.com/wp-content/uploads/ext-www.scienceabc.com/wp-content/uploads/2021/11/Diagram-showing-the-parts-of-a-modern-incandescent-light-bulb.jpg-.jpg",
+            "3d_model": "bulb"
+        }
+    },
+    {
+        
+        "objects":["cell phone","mobile phone"],
+        "lesson": {
+            "template":"TITLE_IMAGE_MODEL",
+            "lesson_id": "4",
+            "lesson_curiosity_text": "Know more",
+            "title": "iPhone 11",
+            "image_url": "https://www.scienceabc.com/wp-content/uploads/ext-www.scienceabc.com/wp-content/uploads/2021/11/Diagram-showing-the-parts-of-a-modern-incandescent-light-bulb.jpg-.jpg",
+            "3d_model": "bulb"
+        }
+    },
+    {
+        
+        "objects":["laptop"],
+        "lesson": {
+            "template":"TITLE_IMAGE_MODEL",
+            "lesson_id": "5",
+            "lesson_curiosity_text": "MacBook Pro M1 Pro",
+            "title": "Macbook Pro M1 Pro 2021",
+            "image_url": "https://www.scienceabc.com/wp-content/uploads/ext-www.scienceabc.com/wp-content/uploads/2021/11/Diagram-showing-the-parts-of-a-modern-incandescent-light-bulb.jpg-.jpg",
+            "3d_model": "none"
+        }
+    },
+    {
+        
+        "objects":["mouse"],
+        "lesson": {
+            "template":"TITLE_IMAGE_MODEL",
+            "lesson_id": "6",
+            "lesson_curiosity_text": "Inventor of Mouse",
+            "title": "Douglas Engelbart",
+            "image_url": "https://www.scienceabc.com/wp-content/uploads/ext-www.scienceabc.com/wp-content/uploads/2021/11/Diagram-showing-the-parts-of-a-modern-incandescent-light-bulb.jpg-.jpg",
+            "3d_model": "none"
+        }
+    },
+    {
+        
+        "objects":["keyboard"],
+        "lesson": {
+            "template":"TITLE_IMAGE_MODEL",
+            "lesson_id": "7",
+            "lesson_curiosity_text": "Why QWERTY?",
+            "title": "QWERTY",
+            "image_url": "https://www.scienceabc.com/wp-content/uploads/ext-www.scienceabc.com/wp-content/uploads/2021/11/Diagram-showing-the-parts-of-a-modern-incandescent-light-bulb.jpg-.jpg",
+            "3d_model": "none"
+        }
+    },
+    {
+       
+        "objects":["car"],
+        "lesson": {
+            "template":"TITLE_IMAGE_MODEL",
+            "lesson_id": "8",
+            "lesson_curiosity_text": "How do car engines work?",
+            "title": "Car Engine",
+            "image_url": "https://www.scienceabc.com/wp-content/uploads/ext-www.scienceabc.com/wp-content/uploads/2021/11/Diagram-showing-the-parts-of-a-modern-incandescent-light-bulb.jpg-.jpg",
+            "3d_model": "none"
+        }
+    },
+    {
+        
+        "objects":["tv"],
+        "lesson": {
+            "template":"TITLE_IMAGE_MODEL",
+            "lesson_id": "9",
+            "lesson_curiosity_text": "What are pixels on a screen?",
+            "title": "What are pixels on a screen?",
+            "image_url": "https://www.scienceabc.com/wp-content/uploads/ext-www.scienceabc.com/wp-content/uploads/2021/11/Diagram-showing-the-parts-of-a-modern-incandescent-light-bulb.jpg-.jpg",
+            "3d_model": "none"
+        }
+    },
+    {
+        
+        "objects":["chair"],
+        "lesson": {
+            "template":"TITLE_VIDEO_MODEL",
+            "lesson_id": "10",
+            "lesson_curiosity_text": "Do chairs exist?",
+            "title": "Do chairs exist?",
+            "image_url": "https://www.scienceabc.com/wp-content/uploads/ext-www.scienceabc.com/wp-content/uploads/2021/11/Diagram-showing-the-parts-of-a-modern-incandescent-light-bulb.jpg-.jpg",
+            "3d_model": "none"
+        }
+    }
+
+    
+
+]
