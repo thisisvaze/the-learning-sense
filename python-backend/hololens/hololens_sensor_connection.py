@@ -23,11 +23,11 @@ class VideoStream():
         # r = requests.get(url, stream=True)
 
         # Using Hololens 2 camera
-        self.capture = cv2.VideoCapture(url)
+        #self.capture = cv2.VideoCapture(url)
 
         # Test with laptop's internal came
         # ra
-        #self.capture = cv2.VideoCapture(0)
+        self.capture = cv2.VideoCapture(0)
 
         self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 428)
         self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)

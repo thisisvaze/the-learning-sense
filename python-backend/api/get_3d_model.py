@@ -4,7 +4,7 @@ import requests
 from PIL import Image
 import gradio as gr
 import json
-
+from api import sketchfab_helper
 
 model_maps = {
     "apple": "588278115f92444fab01aa121da0b244",
@@ -35,19 +35,8 @@ def from_echo3d(keyword):
 
 
 def from_sketchfab(keyword):
-    # iparsing request
-    UID = "young-hat-4823"
-    URL = " https://api.sketchfab.com/v3/models/{UID}/download"
-    response = requests.get(url=URL).json()
-
-    print(response)
-    # parsing response
-    model_url = ""
-    for result in response:
-        if result["gltf_url"]:
-            model_url = result["gltf_url"]
-
-    return model_url
+    sk = sketchfab_helper.sketchfab()
+    return sk.getBestModelFromKeyword(keyword)
 
 
 def from_sketchfab_UID_database(keyword):
@@ -62,3 +51,4 @@ def from_local_hololens_database(keyword):
     data = []
     data.append({"model_url": keyword})
     return data
+

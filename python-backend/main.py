@@ -53,9 +53,9 @@ wit = message_extraction.wit_utilities()
 
 
 # Init hololens connection
-connection_manager = hololens_sensor_connection.HololensConnectionManager(
-    show_stream=False)
-#connection_manager = zed_sensor_connection.ZedConnectionManager()
+# connection_manager = hololens_sensor_connection.HololensConnectionManager(
+#     show_stream=False)
+connection_manager = zed_sensor_connection.ZedConnectionManager()
 
 context_handler_obj = context_handler.context(
     sensor_connection_manager=connection_manager)
@@ -81,22 +81,40 @@ async def websocket_endpoint(websocket: WebSocket):
             await websocket.send_text(f"{sendDataToUnity(CONSTANTS.LESSON_INIT_INFO,lesson_manager.sendLesson(json_data[CONSTANTS.DATA_VALUE]))}")
             context_handler_obj.session.state = CONSTANTS.SESSION_STATE_LESSON_INITIATED
 
-        elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.REQUEST_ENV_INFO_UPDATE:
-            # data = {"Items": lesson_helper.modifylessontags(context_handler_obj.user_preferences.data,
-            # context_handler_obj.env_context.getDefaultParameters(context_handler_obj.gaze_position))}
-            # await websocket.send_text(f"{sendDataToUnity(CONSTANTS.ENVIRONMENT_OJBECTS_UPDATE, data)}")
-
-            data = {"Items": lesson_manager.sendEnvUpdateWithCuriosity(context_handler_obj.user_preferences.data,
-                                                                       context_handler_obj.env_context.getDefaultParameters(context_handler_obj.gaze_position))}
-            await websocket.send_text(f"{sendDataToUnity(CONSTANTS.ENVIRONMENT_OJBECTS_UPDATE, data)}")
-
-        elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.GAZE_INPUT:
-            context_handler_obj.gaze_position = json_data[CONSTANTS.DATA_VALUE]
         elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.SPEECH_SENTENCE_SPOKEN:
             # and context_handler_obj.session.state == CONSTANTS.SESSION_STATE_LESSON_INITIATED:
             data = lesson_manager.handle_speech_message(
                 wit.infer_message(json_data[CONSTANTS.DATA_VALUE]), context_handler_obj)
+            print(data)
             await websocket.send_text(f"{data}")
+
+        elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.REQUEST_ENV_INFO_UPDATE:
+            # dummy data
+            # data = {"Items": {{"lesson_curiosity_text": "What is a plant cell?", "name": "potted plant", "x": 0.1, "y": 0.1,  "z": 0.2, "visibility": 1},
+            #                   {"lesson_curiosity_text": "Specs of MacBook Pro?",
+            #                       "name": "laptop", "x": 0.1, "y": 0.1,  "z": 0.5, "visibility": 1},
+            #                   {"lesson_curiosity_text": "What is a plant cell?",
+            #                       "name": "potted plant", "x": 1.5, "y": 0.1,  "z": 0.8, "visibility": 1},
+            #                   {"lesson_curiosity_text": "What is a plant cell?",
+            #                       "name": "potted plant", "x": 2.5, "y": 0.1,  "z": 0.1, "visibility": 1},
+            #                   {"lesson_curiosity_text": "What is a plant cell?", "name": "potted plant",
+            #                       "x": 0.4, "y": 0.1,  "z": -0.2, "visibility": 1},
+            #                   {"lesson_curiosity_text": "What is a plant cell?", "name": "potted plant",
+            #                       "x": 0.6, "y": 0.1,  "z": -0.7, "visibility": 1},
+            #                   {"lesson_curiosity_text": "What is a plant cell?", "name": "potted plant", "x": 0.8, "y": 0.1,  "z": 0.2, "visibility": 1}}}
+
+            # actual data
+            data = {"Items": lesson_manager.sendEnvUpdateWithCuriosity(context_handler_obj.user_preferences.data,
+                                                                       context_handler_obj.env_context.getDefaultParameters(context_handler_obj.gaze_position))}
+            await websocket.send_text(f"{sendDataToUnity(CONSTANTS.ENVIRONMENT_OJBECTS_UPDATE, data)}")
+
+        # elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.GAZE_INPUT:
+        #     context_handler_obj.gaze_position = json_data[CONSTANTS.DATA_VALUE]
+
+        elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.REQUEST_MODEL_URL:
+            data = {"model_url": get_3d_model.from_sketchfab(
+                json_data[CONSTANTS.DATA_VALUE]), "model_name": json_data[CONSTANTS.DATA_VALUE]}
+            await websocket.send_text(f"{sendDataToUnity(CONSTANTS.DOWNLOAD_AND_SHOW_3D_MODEL,data)}")
 
         elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.BUTTON_PRESSED:
             print(json_data[CONSTANTS.DATA_TYPE],

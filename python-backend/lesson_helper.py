@@ -1,6 +1,6 @@
 import json
 import Constants.Values as CONSTANTS
-from api import descriptive_answering, text_to_speech
+from api import descriptive_answering, text_to_speech, image_utilities, get_3d_model
 
 
 class lesson_helper_object:
@@ -48,13 +48,28 @@ class lesson_helper_object:
             if lesson_curiosity_text == lesson["lesson"]["lesson_curiosity_text"]:
                 return lesson["lesson"]
 
+    def sendAIGeneratedLesson(self, title, model):
+        panel_title = title
+        panel_description = descriptive_answering.openai_text_output(title)
+        panel_image = image_utilities.getMatchingImageUrl(title)
+        # model = {"model_url": get_3d_model.from_sketchfab(
+        #     model), "model_name": model}
+        return {"template": "TITLE_DESCRIPTION_IMAGE_MODEL",
+                "lesson_id": "100",
+                "lesson_curiosity_text": panel_title,
+                "title": panel_title,
+                "description": panel_description,
+                "image_url": panel_image,
+                "3d_model": model}
+
     def handle_speech_message(self, message, context):
         print(message)
         try:
             match message['intents'][0]['name']:
                 case CONSTANTS.load_3d_model:
-                    return {CONSTANTS.DATA_TYPE: "SHOW_3D_MODEL", CONSTANTS.DATA_VALUE: message['entities']['3d_model:3d_model'][0]['body']}
-
+                    return {CONSTANTS.DATA_TYPE: CONSTANTS.SHOW_3D_MODEL, CONSTANTS.DATA_VALUE: message['entities']['3d_model:3d_model'][0]['body']}
+                case CONSTANTS.load_ai_generated_lesson:
+                    return {CONSTANTS.DATA_TYPE: CONSTANTS.LESSON_INIT_INFO, CONSTANTS.DATA_VALUE: self.sendAIGeneratedLesson(message['entities']['lesson_title:lesson_title'][0]['body'], message['entities']['lesson_title:lesson_title'][0]['entities'][0]['body'])}
                 case CONSTANTS.modify_user_preferences:
                     match message['traits']['subject'][0]['value']:
                         case "language":
@@ -78,6 +93,8 @@ class lesson_helper_object:
                     data = descriptive_answering.wolram_results(
                         message['text'])
                     return {CONSTANTS.DATA_TYPE: "SHOW_FACT", CONSTANTS.DATA_VALUE: data}
+                case CONSTANTS.end_lesson:
+                    return {CONSTANTS.DATA_TYPE: "MODIFY_LESSON_STATE",  CONSTANTS.DATA_VALUE: "END_LESSON"}
         except:
             return "This case is not handled"
         # wit_response_message = json.loads(message)

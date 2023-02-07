@@ -244,7 +244,7 @@ class resnet_local:
             for score, label, box in zip(results["scores"], results["labels"], results["boxes"]):
                 box = [round(i, 2) for i in box.tolist()]
                 # let's only keep detections with score > 0.9
-                if score > 0.7:
+                if score > 0.6:
                     x1 = box[0]
                     y1 = box[1]
                     x2 = box[2]

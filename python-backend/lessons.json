@@ -1,4 +1,18 @@
 [
+   
+    {
+        
+        "objects":["potted plant"],
+        "lesson": {
+            "template":"TITLE_DESCRIPTION_IMAGE_MODEL",
+            "lesson_id": "2",
+            "lesson_curiosity_text": "What is a plant cell?",
+            "title": "Plant cell",
+            "description": "Smallest unit of a plant",
+            "image_url": "https://ez002.k12.sd.us/labs/plant.jpg",
+            "3d_model": "plant cell"
+        }
+    },
     {
         
         "objects":["cup", "mug","wine glass"],
@@ -13,14 +27,15 @@
     },
     {
         
-        "objects":["potted plant"],
+        "objects":["cup", "mug","wine glass"],
         "lesson": {
-            "template":"TITLE_IMAGE_MODEL",
+            "template":"TITLE_VIDEO_MODEL",
             "lesson_id": "2",
-            "lesson_curiosity_text": "What is a plant cell?",
-            "title": "Plant cell",
+            "lesson_curiosity_text": "How are coffee beans planted?",
+            "title": "Coffee bean plantations",
+            "description": "Coffee bean plantation",
             "image_url": "https://ez002.k12.sd.us/labs/plant.jpg",
-            "3d_model": "plant_cell"
+            "3d_model": "coffee bean"
         }
     }
     

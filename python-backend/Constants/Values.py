@@ -2,7 +2,7 @@
 OPENAI_API_KEY = "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"
 WOLFRAM_API_KEY = "TT3P62-W479LAP7E3"
 WIT_ACCESS_TOKEN = "UMSUGGCXUXBRUWVSU2M7PY7O2QFK7EGD"
-
+GCP_API_KEY = "AIzaSyAJP4ZwYnV14DJ4MiQIbFzz0VtP1fw5iZM"
 
 # hololens values
 HOLOLENS_IP_ADDRESS = "192.168.0.114"
@@ -38,6 +38,8 @@ SET_USER_PREFERENCES = "SET_USER_PREFERENCES"
 GAZE_INPUT = "GAZE_INPUT"
 MARS_MOVED_LISTENER = "MARS_MOVED_LISTENER"
 MARS_MOVED_UPDATE_POSITION = "MARS_MOVED_UPDATE_POSITION"
+DOWNLOAD_AND_SHOW_3D_MODEL = "DOWNLOAD_AND_SHOW_3D_MODEL"
+REQUEST_MODEL_URL = "REQUEST_MODEL_URL"
 # Zed mini and Hololens 2 Alignment
 DELTA_X = 0.3
 DELTA_Y = 0.2
@@ -49,3 +51,5 @@ load_3d_model = "load_3d_model"
 modify_user_preferences = "modify_user_preferences"
 descriptive_query = "descriptive_query"
 fact_query = "fact_query"
+end_lesson = "end_lesson"
+load_ai_generated_lesson = "load_ai_generated_lesson"
