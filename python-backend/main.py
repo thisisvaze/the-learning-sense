@@ -4,7 +4,7 @@ from asyncio import constants
 from pickle import GLOBAL
 from fastapi_socketio import SocketManager
 from email.mime import image
-from fastapi import FastAPI, UploadFile, WebSocket, File
+from fastapi import FastAPI, UploadFile, WebSocket, File, Request
 from sympy import Q
 import api.ocr_recognition as ocr_recognition
 from api import descriptive_answering, plant_recognition, multiple_object_detection, depth_estimation, get_3d_model, sketch_recognition, visual_question_answering, sentiment_analysis
@@ -53,9 +53,9 @@ wit = message_extraction.wit_utilities()
 
 
 # Init hololens connection
-# connection_manager = hololens_sensor_connection.HololensConnectionManager(
-#     show_stream=False)
-connection_manager = zed_sensor_connection.ZedConnectionManager()
+connection_manager = hololens_sensor_connection.HololensConnectionManager(
+    show_stream=False)
+# connection_manager = zed_sensor_connection.ZedConnectionManager()
 
 context_handler_obj = context_handler.context(
     sensor_connection_manager=connection_manager)
@@ -89,23 +89,8 @@ async def websocket_endpoint(websocket: WebSocket):
             await websocket.send_text(f"{data}")
 
         elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.REQUEST_ENV_INFO_UPDATE:
-            # dummy data
-            # data = {"Items": {{"lesson_curiosity_text": "What is a plant cell?", "name": "potted plant", "x": 0.1, "y": 0.1,  "z": 0.2, "visibility": 1},
-            #                   {"lesson_curiosity_text": "Specs of MacBook Pro?",
-            #                       "name": "laptop", "x": 0.1, "y": 0.1,  "z": 0.5, "visibility": 1},
-            #                   {"lesson_curiosity_text": "What is a plant cell?",
-            #                       "name": "potted plant", "x": 1.5, "y": 0.1,  "z": 0.8, "visibility": 1},
-            #                   {"lesson_curiosity_text": "What is a plant cell?",
-            #                       "name": "potted plant", "x": 2.5, "y": 0.1,  "z": 0.1, "visibility": 1},
-            #                   {"lesson_curiosity_text": "What is a plant cell?", "name": "potted plant",
-            #                       "x": 0.4, "y": 0.1,  "z": -0.2, "visibility": 1},
-            #                   {"lesson_curiosity_text": "What is a plant cell?", "name": "potted plant",
-            #                       "x": 0.6, "y": 0.1,  "z": -0.7, "visibility": 1},
-            #                   {"lesson_curiosity_text": "What is a plant cell?", "name": "potted plant", "x": 0.8, "y": 0.1,  "z": 0.2, "visibility": 1}}}
-
-            # actual data
             data = {"Items": lesson_manager.sendEnvUpdateWithCuriosity(context_handler_obj.user_preferences.data,
-                                                                       context_handler_obj.env_context.getDefaultParameters(context_handler_obj.gaze_position))}
+                                                                       context_handler_obj.env_context.getDefaultParameters())}
             await websocket.send_text(f"{sendDataToUnity(CONSTANTS.ENVIRONMENT_OJBECTS_UPDATE, data)}")
 
         # elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.GAZE_INPUT:
@@ -116,18 +101,22 @@ async def websocket_endpoint(websocket: WebSocket):
                 json_data[CONSTANTS.DATA_VALUE]), "model_name": json_data[CONSTANTS.DATA_VALUE]}
             await websocket.send_text(f"{sendDataToUnity(CONSTANTS.DOWNLOAD_AND_SHOW_3D_MODEL,data)}")
 
-        elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.BUTTON_PRESSED:
-            print(json_data[CONSTANTS.DATA_TYPE],
-                  json_data[CONSTANTS.DATA_VALUE])
-
         elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.SET_USER_PREFERENCES:
             context_handler_obj.user_preferences.set(
                 json_data[CONSTANTS.DATA_VALUE])
-        # elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.MARS_MOVED_UPDATE_POSITION:
-        #     await websocket.send_text(f"{data}")
         else:
             pass
 
+
+@app.post("/add_lessons")
+def updateLessons(new_lesson_data: str):
+    data = json.loads(new_lesson_data)
+    lesson_manager.update_lesson_json(data)
+
+@app.post("/update_user_preferences")
+def updateLessons(new_user_pref_data: str):
+    data = json.loads(new_user_pref_data)
+    context_handler_obj.user_preferences.set(data)
 
 def main():
     uvicorn.run("main:app", host="0.0.0.0",

@@ -2,13 +2,14 @@ import json
 
 
 class Preferences():
-    def __init__(self, user_id):
-        self.user_id = user_id
-        with open("users/user_"+str(user_id)+"_pref.json") as user_pref:
+    def __init__(self):
+        with open("user_pref.json") as user_pref:
             self.data = json.load(user_pref)
 
     def set(self, data):
         self.data = data
+        with open("user_pref.json", "w") as user_pref:
+            json.dump(self.data, user_pref)
 
 
 def main():

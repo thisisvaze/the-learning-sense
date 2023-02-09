@@ -191,7 +191,7 @@ class translation():
 
     def thisText(self, text, language):
         for key, value in lang_codes:
-            if value == language:
+            if value.lower() == language.lower():
                 return self.translator.translate(text, dest=key).text
         return "no translation found"
 

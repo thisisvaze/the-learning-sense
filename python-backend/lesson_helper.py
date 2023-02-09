@@ -1,39 +1,44 @@
 import json
 import Constants.Values as CONSTANTS
-from api import descriptive_answering, text_to_speech, image_utilities, get_3d_model
+from api import descriptive_answering, text_to_speech, image_utilities, get_3d_model, translate_text
 
 
 class lesson_helper_object:
     def __init__(self):
         with open("lessons.json") as lessons:
             self.lessons = json.load(lessons)
+        self.translation_utility = translate_text.translation()
 
-    def initiate_curiousityAndSendToHeadset():
-        with open("sample_context.json") as json_file:
-            baseContext = json.load(json_file)
-        print(baseContext)
-        # return lesson content
-        with open("concepts/surface_area.json") as lesson_content:
-            lesson_object = json.load(lesson_content)
-            return json.dumps(lesson_object)
+    def update_lesson_json(self, json_data):
+        self.lessons.append(json_data)
+        with open("lessons.json", "w") as file:
+            json.dump(self.lessons, file)
 
-    def selectLessonforEnvObject(self, recognized_object_name):
+    def selectLessonforEnvObject(self, recognized_object_name, user_pref):
+        lesson_interest_relevancy = False
         for lesson in self.lessons:
+            for subjects_of_interest in lesson["relevant_subjects"]:
+                if subjects_of_interest["subject"] == user_pref["subject"]:
+                    for topic_of_interest in subjects_of_interest["topic"]:
+                        if user_pref["topic"] == topic_of_interest:
+                            lesson_interest_relevancy = True
             for lesson_initiation_object in lesson["objects"]:
-                if lesson_initiation_object == recognized_object_name:
+                if lesson_initiation_object == recognized_object_name and lesson_interest_relevancy:
                     return lesson["lesson"]
         return "None"
 
     def sendEnvUpdateWithCuriosity(self, user_pref, data):
         if user_pref['subject'] == 'language':
-            return data
+            for recognized_object in data:
+                recognized_object["lesson_curiosity_text"] = self.translation_utility.thisText(
+                    recognized_object["name"], user_pref['topic_of_interest'])
         else:
             for recognized_object in data:
-                d = self.selectLessonforEnvObject(recognized_object["name"])
+                d = self.selectLessonforEnvObject(
+                    recognized_object["name"], user_pref)
                 if d != "None":
                     recognized_object["lesson_curiosity_text"] = d["lesson_curiosity_text"]
                 else:
-                    # need to change it to 0
                     recognized_object["visibility"] = 0
         return data
 
@@ -43,7 +48,6 @@ class lesson_helper_object:
         tts.predict(spoken_results)
 
     def sendLesson(self, lesson_curiosity_text):
-
         for lesson in self.lessons:
             if lesson_curiosity_text == lesson["lesson"]["lesson_curiosity_text"]:
                 return lesson["lesson"]
@@ -97,15 +101,6 @@ class lesson_helper_object:
                     return {CONSTANTS.DATA_TYPE: "MODIFY_LESSON_STATE",  CONSTANTS.DATA_VALUE: "END_LESSON"}
         except:
             return "This case is not handled"
-        # wit_response_message = json.loads(message)
-        # print(wit_response_message)
-
-    # # def choose_lesson():
-    # #     with open("sample_context.json") as json_file:
-    # #         baseContext = json.load(json_file)
-    # #     print(baseContext)
-
-    # def generate_final_send_to_headset():
 
 
 def main():

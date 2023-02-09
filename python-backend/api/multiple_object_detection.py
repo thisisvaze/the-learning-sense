@@ -212,17 +212,13 @@ class fb_resnet_detection_hf:
 
 class resnet_local:
     def __init__(self) -> None:
-        try:
-            self.translator_utility = lang_translator.translation()
-        except:
-            language = "English"
         self.feature_extractor = DetrFeatureExtractor.from_pretrained(
             "facebook/detr-resnet-50")
         self.model = DetrForObjectDetection.from_pretrained(
             "facebook/detr-resnet-50")
         pass
 
-    def trackMultipleObjects(self, frame, sensor, pointcloud=None, language="English", gaze_coordinates="(0,0,0)"):
+    def trackMultipleObjects(self, frame, pointcloud=None):
         # You may need to convert the color.
         img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         im_pil = Image.fromarray(img)
@@ -235,64 +231,31 @@ class resnet_local:
             outputs, target_sizes=target_sizes)[0]
 
         returnString = []
-
-        closest_object_label = None
-        closest_object_to_gaze_x = 0.5
-        closest_object_to_gaze_y = 0.5
-        closest_object_to_gaze_distance = 100000
         try:
             for score, label, box in zip(results["scores"], results["labels"], results["boxes"]):
                 box = [round(i, 2) for i in box.tolist()]
-                # let's only keep detections with score > 0.9
                 if score > 0.6:
                     x1 = box[0]
                     y1 = box[1]
                     x2 = box[2]
                     y2 = box[3]
-                    print(
-                        f"Detected {self.model.config.id2label[label.item()]} with confidence "
-                        f"{round(score.item(), 3)} at location {box}"
-                    )
 
                     label_name = self.model.config.id2label[label.item()]
                     if pointcloud == None:
-                        #point3D = pointcloud.get_value((x1+x2)/2, (y1+y2)/2)
-                        # print(point3D)
                         round_off_param = 2
-                        if language == "English":
-                            returnString.append(
-                                {"lesson_curiosity_text": label_name, "name": label_name, "x": (((x1+x2)/216)-1), "y": (1-((y1+y2)/120))*0.5,  "z": -round(0.8, round_off_param), "visibility": 1})
-                        else:
-                            if (math.pow(closest_object_to_gaze_x - (x1+x2)/2, 2) + math.pow(closest_object_to_gaze_y - (y1+y2)/2, 2)) < closest_object_to_gaze_distance:
-                                closest_object_label = label_name
-                                closest_object_to_gaze_x = (x1+x2)
-                                closest_object_to_gaze_y = (y1+y2)
-                                closest_object_to_gaze_distance = math.pow(
-                                    closest_object_to_gaze_x - (x1+x2)/2, 2) + math.pow(closest_object_to_gaze_y - (y1+y2)/2, 2)
-                            # returnString.append(
-                            #     {"lesson_curiosity_text": self.translator_utility.thisText(label_name, language), "name": label_name, "x": (((x1+x2)/216)-1), "y": (1-((y1+y2)/120))*0.5,  "z": -round(0.8, round_off_param), "visibility": 1})
-
+                        returnString.append(
+                            {"lesson_curiosity_text": label_name, "name": label_name, "x": (((x1+x2)/216)-1), "y": (1-((y1+y2)/120))*0.5,  "z": -round(0.8, round_off_param), "visibility": 1})
                     else:
                         point3D = pointcloud.get_value((x1+x2)/2, (y1+y2)/2)
                         # print(point3D)
                         round_off_param = 2
-                        if language == "English":
-                            returnString.append(
-                                {"lesson_curiosity_text": label_name, "name": label_name, "x": -round(point3D[1][0], round_off_param), "y": -round(point3D[1][1], round_off_param),  "z": -round(point3D[1][2], round_off_param), "visibility": 1})
-                        else:
-                            returnString.append(
-                                {"lesson_curiosity_text": label_name, "name": label_name, "x": -round(point3D[1][0], round_off_param), "y": -round(point3D[1][1], round_off_param),  "z": -round(point3D[1][2], round_off_param), "visibility": 1})
-
-            if language != 'English':
-                returnString.append(
-                    {"lesson_curiosity_text": self.translator_utility.thisText(closest_object_label, language), "name": closest_object_label, "x": (((closest_object_to_gaze_x)/216)-1), "y": (1-((closest_object_to_gaze_y)/120))*0.5,  "z": -round(0.8, round_off_param), "visibility": 1})
-
+                        returnString.append(
+                            {"lesson_curiosity_text": label_name, "name": label_name, "x": -round(point3D[1][0], round_off_param), "y": -round(point3D[1][1], round_off_param),  "z": -round(point3D[1][2], round_off_param), "visibility": 1})
         except:
             returnString.append(
                 {"name": "lost track"})
 
         cv2.imshow("Frame", frame)
-        #print("multiple_object_detection:" + str(returnString))
         key = cv2.waitKey(1)
         if key == ord('q'):
             cv2.destroyAllWindows()
