@@ -7,8 +7,8 @@ from email.mime import image
 from fastapi import FastAPI, UploadFile, WebSocket, File, Request
 from sympy import Q
 import api.ocr_recognition as ocr_recognition
-from api import descriptive_answering, plant_recognition, multiple_object_detection, depth_estimation, get_3d_model, sketch_recognition, visual_question_answering, sentiment_analysis
-from api.norfair_utilities import YOLO, yolo_detections_to_norfair_detections, names
+from api import get_3d_model
+# from api.norfair_utilities import YOLO, yolo_detections_to_norfair_detections, names
 from fastapi.responses import PlainTextResponse
 import os
 from multiprocessing import Process, Manager
@@ -113,10 +113,12 @@ def updateLessons(new_lesson_data: str):
     data = json.loads(new_lesson_data)
     lesson_manager.update_lesson_json(data)
 
+
 @app.post("/update_user_preferences")
 def updateLessons(new_user_pref_data: str):
     data = json.loads(new_user_pref_data)
     context_handler_obj.user_preferences.set(data)
+
 
 def main():
     uvicorn.run("main:app", host="0.0.0.0",

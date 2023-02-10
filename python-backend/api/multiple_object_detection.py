@@ -11,7 +11,6 @@ import Constants.Values as CONSTANTS
 from api.norfair_utilities import Detection, Paths, Tracker, Video
 from norfair.distances import frobenius, iou
 import norfair
-import api.translate_text as lang_translator
 from transformers import DetrFeatureExtractor, DetrForObjectDetection
 import torch
 from PIL import Image
@@ -70,7 +69,6 @@ class resnet_local:
         #     exit(1)
         return returnString
     
-
 # class norfair_yolo_detection(object):
 #     def __init__(self, track_points="bbox"):
 #         self.track_points = track_points
