@@ -94,9 +94,13 @@ class lesson_helper_object:
                     # sendSpeechToUnity(message['text'])
                     return {CONSTANTS.DATA_TYPE: "SHOW_FACT", CONSTANTS.DATA_VALUE: data}
                 case CONSTANTS.fact_query:
-                    data = descriptive_answering.wolram_results(
+                    data = descriptive_answering.openai_text_output(
                         message['text'])
+                    # sendSpeechToUnity(message['text'])
                     return {CONSTANTS.DATA_TYPE: "SHOW_FACT", CONSTANTS.DATA_VALUE: data}
+                    # data = descriptive_answering.wolram_results(
+                    #     message['text'])
+                    # return {CONSTANTS.DATA_TYPE: "SHOW_FACT", CONSTANTS.DATA_VALUE: data}
                 case CONSTANTS.end_lesson:
                     return {CONSTANTS.DATA_TYPE: "MODIFY_LESSON_STATE",  CONSTANTS.DATA_VALUE: "END_LESSON"}
         except:
@@ -106,7 +110,6 @@ class lesson_helper_object:
 def main():
     obj = lesson_helper_object()
     obj.sendSpeechToUnity("how far is earth from sun?")
-
 
 if __name__ == "__main__":
     main()
