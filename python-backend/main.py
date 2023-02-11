@@ -39,7 +39,7 @@ import Constants.Values
 from fastapi.middleware.cors import CORSMiddleware
 
 
-from zed import zed_sensor_connection
+# from zed import zed_sensor_connection
 import lesson_helper
 import context_handler
 import lesson_helper

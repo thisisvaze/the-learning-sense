@@ -4,7 +4,7 @@ import openai
 import json
 import requests
 import urllib.parse
-from chatgpt_wrapper import ChatGPT
+# from chatgpt_wrapper import ChatGPT
 
 OPENAI_API_KEY_OLD = "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"
 OPENAI_API_KEY = "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"
@@ -27,10 +27,10 @@ def openai_text_output(query):
     return response.choices[0].text
 
 
-def chatgpt_response(query, bot):
+# def chatgpt_response(query, bot):
 
-    response = bot.ask(query)
-    return response  # prints the response from chatGPT
+#     response = bot.ask(query)
+#     return response  # prints the response from chatGPT
 
 
 def fact_generator(topic, object_name):

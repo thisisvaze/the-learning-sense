@@ -15,3 +15,5 @@ librosa
 soundfile
 aiohttp
 wit
+google_images_search
+googletrans

@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "Curiosity XR",
+    "slug": "frontend-react",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "Curiosity XR"
+}
