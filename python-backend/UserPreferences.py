@@ -10,7 +10,7 @@ class Preferences():
         self.data = data
         with open("user_pref.json", "w") as user_pref:
             json.dump(self.data, user_pref)
-
+        return json.dumps(self.data)
 
 def main():
     pref = Preferences(1)

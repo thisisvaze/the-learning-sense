@@ -1,18 +1,19 @@
 import json
 import Constants.Values as CONSTANTS
-from api import descriptive_answering, text_to_speech, image_utilities, get_3d_model, translate_text
+from api import descriptive_answering, text_to_speech, image_utilities, get_3d_model, text_translate
 
 
 class lesson_helper_object:
     def __init__(self):
         with open("lessons.json") as lessons:
             self.lessons = json.load(lessons)
-        self.translation_utility = translate_text.translation()
+        self.translation_utility = text_translate.translation()
 
-    def update_lesson_json(self, json_data):
+    def add_lesson(self, json_data):
         self.lessons.append(json_data)
         with open("lessons.json", "w") as file:
             json.dump(self.lessons, file)
+        return json.dumps(self.lessons)
 
     def selectLessonforEnvObject(self, recognized_object_name, user_pref):
         lesson_interest_relevancy = False
@@ -110,6 +111,7 @@ class lesson_helper_object:
 def main():
     obj = lesson_helper_object()
     obj.sendSpeechToUnity("how far is earth from sun?")
+
 
 if __name__ == "__main__":
     main()

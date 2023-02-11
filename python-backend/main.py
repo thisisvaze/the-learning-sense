@@ -36,20 +36,31 @@ import cv2
 from api.norfair_utilities import Detection, Paths, Tracker, Video
 from norfair.distances import frobenius, iou
 import Constants.Values
+from fastapi.middleware.cors import CORSMiddleware
+
 
 from zed import zed_sensor_connection
 import lesson_helper
 import context_handler
 import lesson_helper
 import requests
-from api import message_extraction
+from api import text_intent_classification
 import uvicorn
 from fastapi import WebSocket
 
 
 app = FastAPI()
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 #sio = SocketManager(app=app)
-wit = message_extraction.wit_utilities()
+wit = text_intent_classification.wit_utilities()
 
 
 # Init hololens connection
@@ -109,15 +120,15 @@ async def websocket_endpoint(websocket: WebSocket):
 
 
 @app.post("/add_lessons")
-def updateLessons(new_lesson_data: str):
-    data = json.loads(new_lesson_data)
-    lesson_manager.update_lesson_json(data)
+async def updateLessons(new_lesson_data: Request):
+    data = await new_lesson_data.json()
+    return lesson_manager.add_lesson(data)
 
 
 @app.post("/update_user_preferences")
-def updateLessons(new_user_pref_data: str):
-    data = json.loads(new_user_pref_data)
-    context_handler_obj.user_preferences.set(data)
+async def updateLessons(new_user_pref_data: Request):
+    data = await new_user_pref_data.json()
+    return context_handler_obj.user_preferences.set(data)
 
 
 def main():
