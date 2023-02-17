@@ -2,6 +2,8 @@ import json
 import Constants.Values as CONSTANTS
 from api import descriptive_answering, text_to_speech, image_utilities, get_3d_model, text_translate
 
+import lesson_utilities
+
 
 class lesson_helper_object:
     def __init__(self):
@@ -14,6 +16,28 @@ class lesson_helper_object:
         with open("lessons.json", "w") as file:
             json.dump(self.lessons, file)
         return json.dumps(self.lessons)
+
+    def selectSemanticLessonforEnvObject(self, recognized_object_name, user_pref):
+        relevant_lessons = []
+        for lesson in self.lessons:
+            for lesson_initiation_object in lesson["objects"]:
+                if lesson_initiation_object == recognized_object_name:
+                    relevant_lessons.append(lesson)
+        most_relevant_lesson = lesson_utilities.get_lesson_with_highest_semantic_score(
+            user_pref["topic"], relevant_lessons)
+        return most_relevant_lesson["lesson"]
+
+        # for lesson in self.lessons:
+        #     ["relevant_subjects"]["topic"])
+        #     for subjects_of_interest in lesson["relevant_subjects"]:
+        #         if subjects_of_interest["subject"] == user_pref["subject"]:
+        #             for topic_of_interest in subjects_of_interest["topic"]:
+        #                 if user_pref["topic"] == topic_of_interest:
+        #                     lesson_interest_relevancy = True
+        #     for lesson_initiation_object in lesson["objects"]:
+        #         if lesson_initiation_object == recognized_object_name and lesson_interest_relevancy:
+        #             return lesson["lesson"]
+        return "None"
 
     def selectLessonforEnvObject(self, recognized_object_name, user_pref):
         lesson_interest_relevancy = False

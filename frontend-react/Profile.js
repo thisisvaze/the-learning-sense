@@ -20,7 +20,7 @@ const Profile = () => {
   const handleUserPrefChangeButton = async () => {
     try {
       const response = await fetch(
-        "http://192.168.0.14:8000/update_user_preferences",
+        "http://192.168.0.117:8000/update_user_preferences",
         {
           method: "POST",
           headers: {
@@ -30,7 +30,7 @@ const Profile = () => {
           },
           body: JSON.stringify({
             subject: user_subject,
-            topic_of_interest: user_topic,
+            topic: user_topic,
           }),
         }
       );
