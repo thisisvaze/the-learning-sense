@@ -4,7 +4,7 @@ import openai
 import json
 import requests
 import urllib.parse
-# from chatgpt_wrapper import ChatGPT
+from chatgpt_wrapper import ChatGPT
 
 OPENAI_API_KEY_OLD = "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"
 OPENAI_API_KEY = "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"
@@ -17,20 +17,20 @@ def openai_text_output(query):
 
     response = openai.Completion.create(
         model="text-curie-001",
-        prompt=query + ". Provide an answer under 140 characters",
+        prompt=query + " Provide an answer under 140 characters",
         temperature=0.7,
         max_tokens=256,
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0
     )
-    return response.choices[0].text
+    return response.choices[0].text.strip()
 
 
-# def chatgpt_response(query, bot):
+def chatgpt_response(query, bot):
 
-#     response = bot.ask(query)
-#     return response  # prints the response from chatGPT
+    response = bot.ask(query)
+    return response  # prints the response from chatGPT
 
 
 def fact_generator(topic, object_name):
@@ -105,7 +105,7 @@ def main():
     # test
     #  wolfram if it works
 
-    print(openai_text_output("what is a plant cell?"))
+    print(openai_text_output("what is a plant cell"))
 
 
 if __name__ == "__main__":

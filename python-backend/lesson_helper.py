@@ -2,7 +2,8 @@ import json
 import Constants.Values as CONSTANTS
 from api import descriptive_answering, text_to_speech, image_utilities, get_3d_model, text_translate
 
-import lesson_utilities
+import nltk
+from nltk.corpus import wordnet
 
 
 class lesson_helper_object:
@@ -23,7 +24,7 @@ class lesson_helper_object:
             for lesson_initiation_object in lesson["objects"]:
                 if lesson_initiation_object == recognized_object_name:
                     relevant_lessons.append(lesson)
-        most_relevant_lesson = lesson_utilities.get_lesson_with_highest_semantic_score(
+        most_relevant_lesson = self.get_lesson_with_highest_semantic_score(
             user_pref["topic"], relevant_lessons)
         return most_relevant_lesson["lesson"]
 
@@ -53,18 +54,18 @@ class lesson_helper_object:
         return "None"
 
     def sendEnvUpdateWithCuriosity(self, user_pref, data):
-        if user_pref['subject'] == 'language':
-            for recognized_object in data:
-                recognized_object["lesson_curiosity_text"] = self.translation_utility.thisText(
-                    recognized_object["name"], user_pref['topic_of_interest'])
-        else:
-            for recognized_object in data:
-                d = self.selectLessonforEnvObject(
-                    recognized_object["name"], user_pref)
-                if d != "None":
-                    recognized_object["lesson_curiosity_text"] = d["lesson_curiosity_text"]
-                else:
-                    recognized_object["visibility"] = 0
+        # if user_pref['topic'] == 'language':
+        #     for recognized_object in data:
+        #         recognized_object["lesson_curiosity_text"] = self.translation_utility.thisText(
+        #             recognized_object["name"], user_pref['topic_of_interest'])
+        # else:
+        for recognized_object in data:
+            d = self.selectSemanticLessonforEnvObject(
+                recognized_object["name"], user_pref)
+            if d != "None":
+                recognized_object["lesson_curiosity_text"] = d["lesson_curiosity_text"]
+            else:
+                recognized_object["visibility"] = 0
         return data
 
     def sendSpeechToUnity(query):
@@ -131,10 +132,45 @@ class lesson_helper_object:
         except:
             return "This case is not handled"
 
+    def get_lesson_with_highest_semantic_score(self, tags, lessons):
+        max_score = -1
+        best_lesson = None
+
+        # Calculate the semantic score for each lesson
+        for lesson in lessons:
+            score = 0
+            for tag in tags:
+                # get the first synset for the tag
+                tag_synset = wordnet.synsets(tag)[0]
+                # get the synsets for each word in the lesson
+                lesson_synsets = [wordnet.synsets(
+                    word) for word in lesson["tags"]]
+                # flatten the list of synsets
+                lesson_synsets = [
+                    synset for synsets in lesson_synsets for synset in synsets]
+                # Calculate the similarity between the tag and each word in the lesson
+                similarities = [tag_synset.path_similarity(
+                    lesson_synset) for lesson_synset in lesson_synsets]
+                # get the highest similarity, or 0 if no similarities were found
+                max_similarity = max(similarities) if any(similarities) else 0
+                #score += max_similarity
+                if score < max_similarity:
+                    score = max_similarity
+            # Update the best lesson if this one has a higher score
+            if score > max_score:
+                max_score = score
+                best_lesson = lesson
+        print(best_lesson)
+        return best_lesson
+
 
 def main():
+    env_dummy_data = [{"lesson_curiosity_text": "What is a plant cell?",
+                      "name": "potted plant", "x": 1, "y": 1, "z": 0.1, "visibility": 1}]
     obj = lesson_helper_object()
-    obj.sendSpeechToUnity("how far is earth from sun?")
+    # obj.get_lesson_with_highest_semantic_score({"cylinder"})
+    obj.sendEnvUpdateWithCuriosity({"topic": "science"}, env_dummy_data)
+    #obj.sendSpeechToUnity("how far is earth from sun?")
 
 
 if __name__ == "__main__":
