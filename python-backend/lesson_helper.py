@@ -1,7 +1,7 @@
 import json
 import Constants.Values as CONSTANTS
-from api import descriptive_answering, text_to_speech, image_utilities, get_3d_model, text_translate
-
+from api import descriptive_answering, image_utilities, get_3d_model, text_translate
+#from api import text_to_speech
 import nltk
 from nltk.corpus import wordnet
 
@@ -25,20 +25,10 @@ class lesson_helper_object:
                 if lesson_initiation_object == recognized_object_name:
                     relevant_lessons.append(lesson)
         most_relevant_lesson = self.get_lesson_with_highest_semantic_score(
-            user_pref["topic"], relevant_lessons)
+            {user_pref["topic"]}, relevant_lessons)
+        if most_relevant_lesson == None:
+            return "None"
         return most_relevant_lesson["lesson"]
-
-        # for lesson in self.lessons:
-        #     ["relevant_subjects"]["topic"])
-        #     for subjects_of_interest in lesson["relevant_subjects"]:
-        #         if subjects_of_interest["subject"] == user_pref["subject"]:
-        #             for topic_of_interest in subjects_of_interest["topic"]:
-        #                 if user_pref["topic"] == topic_of_interest:
-        #                     lesson_interest_relevancy = True
-        #     for lesson_initiation_object in lesson["objects"]:
-        #         if lesson_initiation_object == recognized_object_name and lesson_interest_relevancy:
-        #             return lesson["lesson"]
-        return "None"
 
     def selectLessonforEnvObject(self, recognized_object_name, user_pref):
         lesson_interest_relevancy = False
@@ -68,10 +58,10 @@ class lesson_helper_object:
                 recognized_object["visibility"] = 0
         return data
 
-    def sendSpeechToUnity(query):
-        spoken_results = descriptive_answering.wolram_spoken_results(query)
-        tts = text_to_speech.tts_fairseq()
-        tts.predict(spoken_results)
+    # def sendSpeechToUnity(query):
+    #     spoken_results = descriptive_answering.wolram_spoken_results(query)
+    #     tts = text_to_speech.tts_fairseq()
+    #     tts.predict(spoken_results)
 
     def sendLesson(self, lesson_curiosity_text):
         for lesson in self.lessons:
@@ -135,7 +125,6 @@ class lesson_helper_object:
     def get_lesson_with_highest_semantic_score(self, tags, lessons):
         max_score = -1
         best_lesson = None
-
         # Calculate the semantic score for each lesson
         for lesson in lessons:
             score = 0
@@ -160,7 +149,6 @@ class lesson_helper_object:
             if score > max_score:
                 max_score = score
                 best_lesson = lesson
-        print(best_lesson)
         return best_lesson
 
 
@@ -168,8 +156,16 @@ def main():
     env_dummy_data = [{"lesson_curiosity_text": "What is a plant cell?",
                       "name": "potted plant", "x": 1, "y": 1, "z": 0.1, "visibility": 1}]
     obj = lesson_helper_object()
-    # obj.get_lesson_with_highest_semantic_score({"cylinder"})
-    obj.sendEnvUpdateWithCuriosity({"topic": "science"}, env_dummy_data)
+    obj.get_lesson_with_highest_semantic_score({"farming"}, [
+        {"tags": ["maths", "measurements", "volume"],
+         "objects": ["cup", "mug", "wine glass"], "lesson": {"template": "TITLE_DESCRIPTION_IMAGE_MODEL", "id": "1", "lesson_curiosity_text":
+                                                             "How to measure the volume of this cup?", "title": "Volume of a Cylinder",
+                                                             "image_url": "https://www.studygate.com/blog/wp-content/uploads/2017/12/cylinder-volume-formula.png", "3d_model": "Cylinder"}},
+        {"tags": ["science", "farming"], "objects": ["cup", "mug", "wine glass"],
+         "lesson": {"template": "TITLE_VIDEO_MODEL", "lesson_id": "3", "lesson_curiosity_text": "How are coffee beans planted?",
+                    "title": "Coffee bean plantations", "description": "Coffee bean plantation", "image_url": "https://ez002.k12.sd.us/labs/plant.jpg",
+                    "3d_model": "coffee bean"}}])
+    #obj.sendEnvUpdateWithCuriosity({"topic": "science"}, env_dummy_data)
     #obj.sendSpeechToUnity("how far is earth from sun?")
 
 

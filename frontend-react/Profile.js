@@ -1,4 +1,5 @@
 import { StatusBar } from "expo-status-bar";
+import * as Constants from "./Constants.js";
 import {
   ScrollView,
   Input,
@@ -14,13 +15,12 @@ import {
 import React, { useState } from "react";
 
 const Profile = () => {
-  const [user_subject, setUserSubject] = useState("");
   const [user_topic, setUserTopic] = useState("");
 
   const handleUserPrefChangeButton = async () => {
     try {
       const response = await fetch(
-        "http://192.168.0.117:8000/update_user_preferences",
+        Constants.SERVER_IP + "/update_user_preferences",
         {
           method: "POST",
           headers: {
@@ -29,7 +29,6 @@ const Profile = () => {
             "Access-Control-Allow-Origin": "*",
           },
           body: JSON.stringify({
-            subject: user_subject,
             topic: user_topic,
           }),
         }
@@ -69,14 +68,6 @@ const Profile = () => {
               Topic Preferences
             </Heading>
             <VStack space={3} mt="5">
-              <FormControl>
-                <FormControl.Label>Subject</FormControl.Label>
-                <Input
-                  value={user_subject}
-                  onChangeText={setUserSubject}
-                  placeholder="Enter Subject"
-                />
-              </FormControl>
               <FormControl>
                 <FormControl.Label>Topic</FormControl.Label>
                 <Input

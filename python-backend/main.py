@@ -131,6 +131,25 @@ async def updateLessons(new_user_pref_data: Request):
     return context_handler_obj.user_preferences.set(data)
 
 
+@app.post("/send_env_context")
+def main():
+    # data = await env_data.json()
+    ret_data = {"Items": lesson_manager.sendEnvUpdateWithCuriosity(context_handler_obj.user_preferences.data,
+                                                                   [{"lesson_curiosity_text": "potted plant",
+                                                                     "name": "potted plant", "x": 1, "y": 1, "z": 0.1, "visibility": 1},
+                                                                    {"lesson_curiosity_text": "mug",
+                                                                     "name": "mug", "x": 1, "y": 1, "z": 0.1, "visibility": 1},
+                                                                    {"lesson_curiosity_text": "table",
+                                                                     "name": "table", "x": 1, "y": 1, "z": 0.1, "visibility": 1},
+                                                                    {"lesson_curiosity_text": "chair",
+                                                                     "name": "chair", "x": 1, "y": 1, "z": 0.1, "visibility": 1},
+                                                                    {"lesson_curiosity_text": "laptop",
+                                                                     "name": "laptop", "x": 1, "y": 1, "z": 0.1, "visibility": 1},
+                                                                    {"lesson_curiosity_text": "mouse",
+                                                                     "name": "mouse", "x": 1, "y": 1, "z": 0.1, "visibility": 1}])}
+    return ret_data
+
+
 def main():
     uvicorn.run("main:app", host="0.0.0.0",
                 port=8000, log_level="info", reload=True)

@@ -1,4 +1,5 @@
 import { StatusBar } from "expo-status-bar";
+import * as Constants from "./Constants.js";
 import {
   ScrollView,
   Input,
@@ -12,6 +13,9 @@ import {
   FormControl,
   Select,
   NativeBaseProvider,
+  View,
+  Tag,
+  StyleSheet,
 } from "native-base";
 import React, { useState } from "react";
 const object_data = [
@@ -94,51 +98,51 @@ const object_data = [
   "wine glass",
   "zebra",
 ];
-const subject_data = [
-  {
-    subject: "Science",
-    topic: ["Physics", "Chemistry", "Biology", "Material Science"],
-  },
-  {
-    subject: "Mathematics",
-    topic: ["Art", "Ideas", "Abstract"],
-  },
-  {
-    subject: "Philosophy",
-    topic: ["Surface Area", "Geometry", "Trigonometry"],
-  },
-  {
-    subject: "History",
-    topic: ["Politics", "Social", "Economic", "Cultural", "intellectual"],
-  },
-  {
-    subject: "Geography",
-    topic: ["Ma", "Geometry", "Trigonometry"],
-  },
-  {
-    subject: "Language",
-    topic: ["French", "German", "Italian"],
-  },
-];
+// const subject_data = [
+//   {
+//     subject: "Science",
+//     topic: ["Physics", "Chemistry", "Biology", "Material Science"],
+//   },
+//   {
+//     subject: "Mathematics",
+//     topic: ["Art", "Ideas", "Abstract"],
+//   },
+//   {
+//     subject: "Philosophy",
+//     topic: ["Surface Area", "Geometry", "Trigonometry"],
+//   },
+//   {
+//     subject: "History",
+//     topic: ["Politics", "Social", "Economic", "Cultural", "intellectual"],
+//   },
+//   {
+//     subject: "Geography",
+//     topic: ["Ma", "Geometry", "Trigonometry"],
+//   },
+//   {
+//     subject: "Language",
+//     topic: ["French", "German", "Italian"],
+//   },
+// ];
 
 var objects_list = object_data.map((x) => {
   return <Select.Item label={x} value={x} />;
 });
 
-var subjects_list = subject_data.map((x) => {
-  return <Select.Item label={x.subject} value={x.subject} />;
-});
-function topics_list(subject) {
-  console.log(subject);
-  if (subject == "") {
-    return "";
-  }
-  return subject_data
-    .filter((x) => x.subject == subject)[0]
-    .topic.map((x) => {
-      return <Select.Item label={x} value={x} />;
-    });
-}
+// var subjects_list = subject_data.map((x) => {
+//   return <Select.Item label={x.subject} value={x.subject} />;
+// });
+// function topics_list(subject) {
+//   console.log(subject);
+//   if (subject == "") {
+//     return "";
+//   }
+//   return subject_data
+//     .filter((x) => x.subject == subject)[0]
+//     .topic.map((x) => {
+//       return <Select.Item label={x} value={x} />;
+//     });
+// }
 const Lesson = () => {
   const [objectName, setObjectName] = useState("");
   const [subject, setSubject] = useState("");
@@ -150,12 +154,27 @@ const Lesson = () => {
   const [user_subject, setUserSubject] = useState("");
   const [user_topic, setUserTopic] = useState("");
   const [service, setService] = React.useState("");
+  const [tags, setTags] = useState([]);
+  const [text, setText] = useState("");
+  const addTag = () => {
+    if (text.trim() === "") return;
+
+    const newTags = [...tags, text.trim()];
+    setTags(newTags);
+    setText("");
+  };
+
+  const removeTag = (tag) => {
+    const newTags = tags.filter((t) => t !== tag);
+    setTags(newTags);
+  };
+
   const handleSubmit = async () => {
     try {
       console.log(
         "data" + JSON.stringify({ app: "asdas" }) + " sent to server"
       );
-      const response = await fetch("http://192.168.0.117:8000/add_lessons", {
+      const response = await fetch(Constants.SERVER_IP + "/add_lessons", {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -163,12 +182,7 @@ const Lesson = () => {
           "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify({
-          relevant_subjects: [
-            {
-              subject,
-              topic: [topic],
-            },
-          ],
+          tags: [tags],
           objects: [objectName],
           lesson: {
             template: "TITLE_DESCRIPTION_IMAGE_MODEL",
@@ -327,48 +341,25 @@ const Lesson = () => {
             ></Heading>
             <VStack space={3} mt="5">
               <FormControl>
-                <FormControl.Label>Subject</FormControl.Label>
-                {/* <Input
-                  value={subject}
-                  onChangeText={setSubject}
-                  placeholder="Enter Subject"
-                /> */}
-                <Select
-                  selectedValue={subject}
-                  minWidth="200"
-                  accessibilityLabel="Select a subject"
-                  placeholder="Select a subject"
-                  _selectedItem={{
-                    bg: "teal.600",
-                    endIcon: <CheckIcon size="5" />,
-                  }}
-                  mt={1}
-                  onValueChange={setSubject}
-                >
-                  {subjects_list}
-                </Select>
-              </FormControl>
-              <FormControl>
-                <FormControl.Label>Topic</FormControl.Label>
-                {/* <Input
-                  value={topic}
-                  onChangeText={setTopic}
-                  placeholder="Enter topic"
-                /> */}
-                <Select
-                  selectedValue={topic}
-                  minWidth="200"
-                  accessibilityLabel="Select a topic"
-                  placeholder="Select a topic"
-                  _selectedItem={{
-                    bg: "teal.600",
-                    endIcon: <CheckIcon size="5" />,
-                  }}
-                  mt={1}
-                  onValueChange={setTopic}
-                >
-                  {topics_list(subject)}
-                </Select>
+                <FormControl.Label>Tags</FormControl.Label>
+                <View>
+                  <View>
+                    {tags.map((tag) => (
+                      <Tag key={tag} onPress={() => removeTag(tag)}>
+                        <Tag.Label>{tag}</Tag.Label>
+                        <Tag.CloseIcon />
+                      </Tag>
+                    ))}
+                  </View>
+                  <Input
+                    placeholder="Add a tag"
+                    value={text}
+                    onChangeText={setText}
+                    onSubmitEditing={addTag}
+                    blurOnSubmit={false}
+                  />
+                </View>
+                {/* {/*  */}
               </FormControl>
               <Button onPress={handleSubmit} mt="2" colorScheme="tertiary">
                 Add lesson
@@ -380,4 +371,20 @@ const Lesson = () => {
     </NativeBaseProvider>
   );
 };
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flexDirection: "row",
+//     alignItems: "center",
+//   },
+//   tagList: {
+//     flexDirection: "row",
+//     flexWrap: "wrap",
+//     marginRight: 8,
+//   },
+//   tag: {
+//     marginRight: 4,
+//   },
+// });
+
 export default Lesson;
