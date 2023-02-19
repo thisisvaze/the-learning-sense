@@ -1,5 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import * as Constants from "./Constants.js";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+
 import {
   ScrollView,
   Input,
@@ -16,88 +18,13 @@ import {
   View,
   Tag,
   StyleSheet,
+  Text,
+  Icon,
+  Ionicons,
+  HStack,
 } from "native-base";
 import React, { useState } from "react";
-const object_data = [
-  "airplane",
-  "apple",
-  "backpack",
-  "banana",
-  "baseball bat",
-  "baseball glove",
-  "bear",
-  "bed",
-  "bench",
-  "bicycle",
-  "bird",
-  "boat",
-  "book",
-  "bottle",
-  "bowl",
-  "broccoli",
-  "bus",
-  "cake",
-  "car",
-  "carrot",
-  "cat",
-  "cell phone",
-  "chair",
-  "clock",
-  "cow",
-  "cup",
-  "dog",
-  "donut",
-  "dining table",
-  "elephant",
-  "fire hydrant",
-  "fork",
-  "frisbee",
-  "giraffe",
-  "handbag",
-  "hair drier",
-  "horse",
-  "hot dog",
-  "keyboard",
-  "kite",
-  "knife",
-  "laptop",
-  "microwave",
-  "motorcycle",
-  "mouse",
-  "orange",
-  "oven",
-  "parking meter",
-  "person",
-  "pizza",
-  "potted plant",
-  "refrigerator",
-  "remote",
-  "scissors",
-  "sheep",
-  "sink",
-  "skateboard",
-  "skis",
-  "snowboard",
-  "spoon",
-  "sports ball",
-  "stop sign",
-  "suitcase",
-  "surfboard",
-  "teddy bear",
-  "tennis racket",
-  "tie",
-  "toaster",
-  "toilet",
-  "toothbrush",
-  "traffic light",
-  "train",
-  "truck",
-  "tv",
-  "umbrella",
-  "vase",
-  "wine glass",
-  "zebra",
-];
+
 // const subject_data = [
 //   {
 //     subject: "Science",
@@ -125,7 +52,7 @@ const object_data = [
 //   },
 // ];
 
-var objects_list = object_data.map((x) => {
+var objects_list = Constants.object_data.map((x) => {
   return <Select.Item label={x} value={x} />;
 });
 
@@ -143,32 +70,41 @@ var objects_list = object_data.map((x) => {
 //       return <Select.Item label={x} value={x} />;
 //     });
 // }
+
 const Lesson = () => {
   const [objectName, setObjectName] = useState("");
-  const [subject, setSubject] = useState("");
-  const [topic, setTopic] = useState("");
   const [lessonTitle, setLessonTitle] = useState("");
   const [lessonDescription, setLessonDescription] = useState("");
   const [lessonImageLink, setLessonImageLink] = useState("");
   const [model3D, setModel3D] = useState("");
-  const [user_subject, setUserSubject] = useState("");
-  const [user_topic, setUserTopic] = useState("");
-  const [service, setService] = React.useState("");
+  const [inputValue, setInputValue] = useState("");
   const [tags, setTags] = useState([]);
-  const [text, setText] = useState("");
-  const addTag = () => {
-    if (text.trim() === "") return;
 
-    const newTags = [...tags, text.trim()];
-    setTags(newTags);
-    setText("");
+  const handleInputChange = (value) => {
+    setInputValue(value);
   };
 
-  const removeTag = (tag) => {
-    const newTags = tags.filter((t) => t !== tag);
-    setTags(newTags);
+  const handleAddTag = (tag) => {
+    setTags([...tags, tag]);
+    setInputValue("");
   };
 
+  const handleRemoveTag = (tag) => {
+    setTags(tags.filter((t) => t !== tag));
+  };
+
+  const renderTag = (tag) => (
+    <Button
+      size="sm"
+      backgroundColor="tertiary.100"
+      variant="subtle"
+      onPress={() => handleRemoveTag(tag)}
+      endIcon={<Icon as={MaterialCommunityIcons} name="close" size="sm" />}
+      marginBottom="0.3em"
+    >
+      {tag}
+    </Button>
+  );
   const handleSubmit = async () => {
     try {
       console.log(
@@ -182,7 +118,7 @@ const Lesson = () => {
           "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify({
-          tags: [tags],
+          tags: tags,
           objects: [objectName],
           lesson: {
             template: "TITLE_DESCRIPTION_IMAGE_MODEL",
@@ -198,9 +134,11 @@ const Lesson = () => {
 
       const data = await response.json();
       console.log(data);
+      alert("Lesson added");
     } catch (error) {
       console.log("data error to server");
       console.error(error);
+      alert("Error adding lesson");
     }
   };
 
@@ -208,17 +146,6 @@ const Lesson = () => {
     <NativeBaseProvider>
       <ScrollView h="80">
         <Center w="100%">
-          <Heading
-            size="xl"
-            padding={10}
-            color="tertiary.500"
-            _dark={{
-              color: "blue.50",
-            }}
-            fontWeight="bold"
-          >
-            XR mini-lesson
-          </Heading>
           <Box safeArea p="2" w="90%" maxW="400" py="8">
             <Heading
               size="lg"
@@ -328,7 +255,7 @@ const Lesson = () => {
               }}
               fontWeight="semibold"
             >
-              3. Subject
+              3. Tags
             </Heading>
             <Heading
               mt="1"
@@ -341,25 +268,49 @@ const Lesson = () => {
             ></Heading>
             <VStack space={3} mt="5">
               <FormControl>
-                <FormControl.Label>Tags</FormControl.Label>
                 <View>
-                  <View>
-                    {tags.map((tag) => (
-                      <Tag key={tag} onPress={() => removeTag(tag)}>
-                        <Tag.Label>{tag}</Tag.Label>
-                        <Tag.CloseIcon />
-                      </Tag>
-                    ))}
-                  </View>
+                  <HStack space={2}>{tags.map(renderTag)}</HStack>
                   <Input
-                    placeholder="Add a tag"
-                    value={text}
-                    onChangeText={setText}
-                    onSubmitEditing={addTag}
-                    blurOnSubmit={false}
+                    placeholder="Add tags"
+                    value={inputValue}
+                    onChangeText={handleInputChange}
                   />
+                  {inputValue ? (
+                    <View>
+                      <Box
+                        rounded="lg"
+                        overflow="hidden"
+                        borderColor="coolGray.200"
+                        borderWidth="1"
+                        _dark={{
+                          borderColor: "coolGray.600",
+                          backgroundColor: "gray.700",
+                        }}
+                        _web={{
+                          shadow: 2,
+                          borderWidth: 0,
+                        }}
+                        _light={{
+                          backgroundColor: "gray.50",
+                        }}
+                      >
+                        {Constants.TAGS.filter((tag) => !tags.includes(tag))
+                          .filter((tag) =>
+                            tag.toLowerCase().includes(inputValue.toLowerCase())
+                          )
+                          .map((tag) => (
+                            <Button
+                              variant="ghost"
+                              key={tag}
+                              onPress={() => handleAddTag(tag)}
+                            >
+                              {tag}
+                            </Button>
+                          ))}
+                      </Box>
+                    </View>
+                  ) : null}
                 </View>
-                {/* {/*  */}
               </FormControl>
               <Button onPress={handleSubmit} mt="2" colorScheme="tertiary">
                 Add lesson

@@ -36,9 +36,11 @@ const Profile = () => {
 
       const data = await response.json();
       console.log(data);
+      alert("User Preferences updated");
     } catch (error) {
       console.log("data error to server");
       console.error(error);
+      alert("Error updaing user preferences");
     }
   };
   return (
@@ -47,7 +49,7 @@ const Profile = () => {
         <Center w="100%">
           <Box safeArea p="2" w="90%" maxW="400" py="8">
             <Heading
-              size="lg"
+              size="md"
               color="coolGray.800"
               _dark={{
                 color: "warmGray.50",
