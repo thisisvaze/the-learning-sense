@@ -56,18 +56,7 @@ const Profile = () => {
               }}
               fontWeight="semibold"
             >
-              Aaditya Vaze
-            </Heading>
-            <Heading
-              mt="1"
-              color="coolGray.600"
-              _dark={{
-                color: "warmGray.200",
-              }}
-              fontWeight="medium"
-              size="xs"
-            >
-              Topic Preferences
+              Learning preferences
             </Heading>
             <VStack space={3} mt="5">
               <FormControl>
@@ -83,7 +72,7 @@ const Profile = () => {
                 mt="2"
                 colorScheme="tertiary"
               >
-                Update User Preferences
+                Update
               </Button>
             </VStack>
           </Box>
