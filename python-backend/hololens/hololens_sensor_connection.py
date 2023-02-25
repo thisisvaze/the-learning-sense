@@ -66,8 +66,8 @@ class VideoStream():
             return self.frame
         elif mode == "base64":
             retval, buffer = cv2.imencode('.jpg', self.frame)
-            jpg_as_text = base64.b64encode(buffer)
-            print(jpg_as_text[:80])
+            jpg_as_text = base64.b64encode(buffer).decode("utf-8")
+            #print(jpg_as_text[:80])
             return jpg_as_text
 
     def get_current_point_cloud(self):

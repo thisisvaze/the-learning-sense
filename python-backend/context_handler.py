@@ -48,25 +48,27 @@ class env_context():
 
     # to be implemented later
 
-    # def getSpecialParameters(self, color=True, material=False):
-    #     return self.getObjectCharactersics(self, color, material)
-    # def getObjectCharacterstics(self, color, material):
-    #     data = []
-    #     if color:
-    #         self.getColorsOfObjectsInEnvironment()
-    #     if material:
-    #         self.getMaterialsOfObjectsInEnvironment()
-    #     # print(data)
+    async def getSpecialParameters(self, color=True, material=False):
+        return await self.getObjectCharacterstics(color, material)
 
-    # def getColorsOfObjectsInEnvironment(self):
-    #     retval, buffer = cv2.imencode(
-    #         '.jpg', self.sensor_connection_manager.videoStream.get_current_frame())
-    #     base64_encoded_image = base64.b64encode(buffer)
-    #     return vqa.getConcurrentMultipleResults(base64_encoded_image, ["what is the color of cup?", "where is this place?", "what is happening in this scene?"])
+    async def getObjectCharacterstics(self, color, material):
+        data = []
+        if color:
+            await self.getColorsOfObjectsInEnvironment()
+        # if material:
+        #     await self.getMaterialsOfObjectsInEnvironment()
+        # print(data)
 
-    # def getMaterialsOfObjectsInEnvironment(self):
-    #     retval, buffer = cv2.imencode(
-    #         '.jpg', self.sensor_connection_manager.videoStream.get_current_frame())
-    #     base64_encoded_image = base64.b64encode(buffer)
+    def getColorsOfObjectsInEnvironment(self):
+        base64_encoded_image = self.sensor_connection_manager.videoStream.get_current_frame(
+            mode="base64")
+        asyncio.run(vqa.getConcurrentMultipleResults(base64_encoded_image, [
+            "what is the color of cup?", "where is this place?", "what is the color of shirt?", "how many eyes?",
+            "what is the color of cup?", "where is this place?", "what is the color of shirt?", "how many eyes?"]))
 
-    #     return vqa.getConcurrentMultipleResults(base64_encoded_image, ["what is the color of cup?", "where is this place?", "what is happening in this scene?"])
+    def getMaterialsOfObjectsInEnvironment(self):
+        retval, buffer = cv2.imencode(
+            '.jpg', self.sensor_connection_manager.videoStream.get_current_frame())
+        base64_encoded_image = base64.b64encode(buffer)
+
+        return vqa.getConcurrentMultipleResults(base64_encoded_image, ["what is the color of cup?", "where is this place?", "what is happening in this scene?"])

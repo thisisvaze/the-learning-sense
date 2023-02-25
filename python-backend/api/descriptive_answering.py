@@ -17,7 +17,7 @@ def openai_text_output(query):
 
     response = openai.Completion.create(
         model="text-curie-001",
-        prompt=query + " Provide an answer under 140 characters",
+        prompt=query + ". Provide an answer under 140 characters",
         temperature=0.7,
         max_tokens=256,
         top_p=1,

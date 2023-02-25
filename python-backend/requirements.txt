@@ -17,3 +17,5 @@ aiohttp
 wit
 google_images_search
 googletrans
+sympy
+transformers

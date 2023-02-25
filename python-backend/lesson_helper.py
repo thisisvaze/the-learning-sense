@@ -91,17 +91,8 @@ class lesson_helper_object:
                 case CONSTANTS.load_ai_generated_lesson:
                     return {CONSTANTS.DATA_TYPE: CONSTANTS.LESSON_INIT_INFO, CONSTANTS.DATA_VALUE: self.sendAIGeneratedLesson(message['entities']['lesson_title:lesson_title'][0]['body'], message['entities']['lesson_title:lesson_title'][0]['entities'][0]['body'])}
                 case CONSTANTS.modify_user_preferences:
-                    match message['traits']['subject'][0]['value']:
-                        case "language":
-                            context.user_preferences.set(
-                                {"subject": message['traits']['subject'][0]['value'], "topic_of_interest": message['entities']['topic_of_interest:topic_of_interest'][0]['body']})
-                        case "science":
-                            context.user_preferences.set(
-                                {"subject": message['traits']['subject'][0]['value'], "topic_of_interest": "plants"})
-                        case "mathematics":
-                            context.user_preferences.set(
-                                {"subject": message['traits']['subject'][0]['value'], "topic_of_interest": "volume"})
-
+                    context.user_preferences.set(
+                        {"topic": message['entities']['topic_of_interest:topic_of_interest'][0]['body']})
                     return {CONSTANTS.DATA_TYPE: "SPEECH_HANDLED_IN_SERVER", CONSTANTS.DATA_VALUE: str(context.user_preferences.data)}
 
                 case CONSTANTS.descriptive_query:

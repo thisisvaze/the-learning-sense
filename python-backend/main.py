@@ -39,7 +39,7 @@ import Constants.Values
 from fastapi.middleware.cors import CORSMiddleware
 
 
-# from zed import zed_sensor_connection
+from zed import zed_sensor_connection
 import lesson_helper
 import context_handler
 import lesson_helper
@@ -59,14 +59,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-#sio = SocketManager(app=app)
+# sio = SocketManager(app=app)
 wit = text_intent_classification.wit_utilities()
 
 
 # Init hololens connection
-connection_manager = hololens_sensor_connection.HololensConnectionManager(
-    show_stream=False)
-# connection_manager = zed_sensor_connection.ZedConnectionManager()
+#connection_manager = hololens_sensor_connection.HololensConnectionManager(
+ #   show_stream=False)
+connection_manager = zed_sensor_connection.ZedConnectionManager()
 
 context_handler_obj = context_handler.context(
     sensor_connection_manager=connection_manager)
@@ -80,7 +80,7 @@ def sendDataToUnity(tag, data):
     return sendinthisdata
 
 
-@app.websocket("/ws")
+@ app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     while True:
@@ -119,44 +119,49 @@ async def websocket_endpoint(websocket: WebSocket):
             pass
 
 
-@app.post("/add_lessons")
+@ app.post("/add_lessons")
 async def updateLessons(new_lesson_data: Request):
     data = await new_lesson_data.json()
     return lesson_manager.add_lesson(data)
 
 
-@app.post("/update_user_preferences")
+@ app.post("/update_user_preferences")
 async def updateLessons(new_user_pref_data: Request):
     data = await new_user_pref_data.json()
     return context_handler_obj.user_preferences.set(data)
 
 
-@app.get("/get_lessons")
+@ app.get("/get_special_parametere")
+def main():
+    return context_handler_obj.env_context.getColorsOfObjectsInEnvironment()
+
+
+@ app.get("/get_lessons")
 async def main():
     return lesson_manager.lessons
 
 
-@app.get("/get_user_preferences")
+@ app.get("/get_user_preferences")
 async def main():
     return context_handler_obj.user_preferences.data
 
 
-@app.post("/send_env_context")
+@ app.post("/send_env_context")
 def main():
     # data = await env_data.json()
     ret_data = {"Items": lesson_manager.sendEnvUpdateWithCuriosity(context_handler_obj.user_preferences.data,
                                                                    [{"lesson_curiosity_text": "potted plant",
-                                                                     "name": "potted plant", "x": 1, "y": 1, "z": 0.1, "visibility": 1},
+                                                                    "name": "potted plant", "x": 1, "y": 1, "z": 0.1, "visibility": 1},
                                                                     {"lesson_curiosity_text": "mug",
-                                                                     "name": "mug", "x": 1, "y": 1, "z": 0.1, "visibility": 1},
+                                                                    "name": "mug", "x": 1, "y": 1, "z": 0.1, "visibility": 1},
                                                                     {"lesson_curiosity_text": "table",
-                                                                     "name": "table", "x": 1, "y": 1, "z": 0.1, "visibility": 1},
+                                                                    "name": "table", "x": 1, "y": 1, "z": 0.1, "visibility": 1},
                                                                     {"lesson_curiosity_text": "chair",
-                                                                     "name": "chair", "x": 1, "y": 1, "z": 0.1, "visibility": 1},
+                                                                    "name": "chair", "x": 1, "y": 1, "z": 0.1, "visibility": 1},
                                                                     {"lesson_curiosity_text": "laptop",
-                                                                     "name": "laptop", "x": 1, "y": 1, "z": 0.1, "visibility": 1},
+                                                                    "name": "laptop", "x": 1, "y": 1, "z": 0.1, "visibility": 1},
                                                                     {"lesson_curiosity_text": "mouse",
-                                                                     "name": "mouse", "x": 1, "y": 1, "z": 0.1, "visibility": 1}])}
+                                                                    "name": "mouse", "x": 1, "y": 1, "z": 0.1, "visibility": 1}])}
     return ret_data
 
 
