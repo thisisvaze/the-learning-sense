@@ -59,6 +59,7 @@ class sketchfab():
         response = requests.get(API_URL, headers=headers).json()
         for result in response["results"]:
             if result["archives"]["glb"]["faceCount"] < polygonCountLimit:
+                print(result["uid"])
                 return result["uid"]
 
         return "no_valid_model_found"
@@ -79,10 +80,11 @@ class sketchfab():
     def getBestModelFromKeyword(self, keyword):
         return self.getBestModelFileURL(self.getBestModelUUID(keyword))
 
+
 def main():
     sk = sketchfab()
 
-    sk.getBestModelFileURL(sk.getBestModelUUID("cup"))
+    sk.getBestModelUUID("bacteria")
 
 
 if __name__ == "__main__":

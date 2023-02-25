@@ -18,6 +18,7 @@ import {
   View,
   Tag,
   StyleSheet,
+  Alert,
   Text,
   Icon,
   Ionicons,
@@ -155,7 +156,7 @@ const Lesson = () => {
               }}
               fontWeight="semibold"
             >
-              1. Lesson Anchored object
+              Lesson Anchored Object
             </Heading>
             <Heading
               mt="1"
@@ -200,7 +201,7 @@ const Lesson = () => {
               }}
               fontWeight="semibold"
             >
-              2. Lesson Content
+              Lesson Content
             </Heading>
             <Heading
               mt="1"
@@ -255,7 +256,7 @@ const Lesson = () => {
               }}
               fontWeight="semibold"
             >
-              3. Tags
+              Tags
             </Heading>
             <Heading
               mt="1"
