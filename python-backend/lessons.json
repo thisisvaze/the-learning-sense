@@ -12,7 +12,7 @@
             "lesson_id": "2",
             "lesson_curiosity_text": "What is a plant cell?",
             "title": "Plant cell",
-            "description": "Smallest unit of a plant",
+            "description": "A plant cell is a basic unit of life in plants. It is a type of eukaryotic cell, which means it has a nucleus and other structures called organelles inside it. They have organelles such as choloroplast that help them make their own food from sunlight.",
             "image_url": "https://ez002.k12.sd.us/labs/plant.jpg",
             "3d_model": "plant cell"
         }
@@ -166,6 +166,23 @@
             "description": "Asadasd",
             "image_url": "asdas",
             "3d_model": "asdasd"
+        }
+    },
+    {
+        "tags": [
+            "History"
+        ],
+        "objects": [
+            "keyboard"
+        ],
+        "lesson": {
+            "template": "TITLE_DESCRIPTION_IMAGE_MODEL",
+            "lesson_id": "100",
+            "lesson_curiosity_text": "who invented keyboard?",
+            "title": "who invented keyboard?",
+            "description": "I invented keyboard",
+            "image_url": "",
+            "3d_model": "computer"
         }
     }
 ]

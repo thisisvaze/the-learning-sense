@@ -17,14 +17,14 @@ def openai_text_output(query):
 
     response = openai.Completion.create(
         model="text-curie-001",
-        prompt=query + ". Provide an answer under 140 characters",
+        prompt=query + " Provide an answer under 140 characters",
         temperature=0.7,
         max_tokens=256,
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0
     )
-    return response.choices[0].text.strip()
+    return response.choices[0].text.replace('\"', '').replace('\'', '').replace('\n', '')
 
 
 def chatgpt_response(query, bot):

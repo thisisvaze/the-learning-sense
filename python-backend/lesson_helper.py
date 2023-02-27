@@ -70,7 +70,7 @@ class lesson_helper_object:
 
     def sendAIGeneratedLesson(self, title, model):
         panel_title = title
-        panel_description = descriptive_answering.openai_text_output(title)
+        panel_description = descriptive_answering.openai_text_output("describe " + title + " in 140 characters")
         panel_image = image_utilities.getMatchingImageUrl(title)
         # model = {"model_url": get_3d_model.from_sketchfab(
         #     model), "model_name": model}
