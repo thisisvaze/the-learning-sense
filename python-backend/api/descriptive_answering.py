@@ -4,7 +4,6 @@ import openai
 import json
 import requests
 import urllib.parse
-from chatgpt_wrapper import ChatGPT
 
 OPENAI_API_KEY_OLD = "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"
 OPENAI_API_KEY = "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"
@@ -13,7 +12,7 @@ openai.api_key = OPENAI_API_KEY
 WOLFRAM_API_KEY = "TT3P62-W479LAP7E3"
 
 
-def openai_text_output(query):
+def openai_text_output_old(query):
 
     response = openai.Completion.create(
         model="text-curie-001",
@@ -27,10 +26,14 @@ def openai_text_output(query):
     return response.choices[0].text.replace('\"', '').replace('\'', '').replace('\n', '')
 
 
-def chatgpt_response(query, bot):
+def openai_text_output(query):
 
-    response = bot.ask(query)
-    return response  # prints the response from chatGPT
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "system", "content": "You are a helpful teacher."},
+                  {"role": "user", "content": query + ". Provide an answer under 140 characters"}]
+    )
+    return response["choices"][0]["message"]["content"].replace('\"', '').replace('\'', '').replace('\n', '')
 
 
 def fact_generator(topic, object_name):

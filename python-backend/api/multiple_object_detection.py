@@ -1,6 +1,6 @@
 from re import T
 import json
-#from google.cloud import vision
+from google.cloud import vision
 import copy
 import math
 import base64
@@ -19,6 +19,7 @@ import requests
 DISTANCE_THRESHOLD_BBOX: float = 2
 DISTANCE_THRESHOLD_CENTROID: int = 30
 MAX_DISTANCE: int = 10000
+
 
 class resnet_local:
     def __init__(self) -> None:
@@ -68,7 +69,79 @@ class resnet_local:
         #     cv2.destroyAllWindows()
         #     exit(1)
         return returnString
-    
+
+
+class gcp_cloud:
+    def __init__(self) -> None:
+
+        self.client = vision.ImageAnnotatorClient()
+        pass
+
+    def trackMultipleObjects(self, frame, pointcloud=None):
+        retval, buffer = cv2.imencode('.jpg', frame)
+        base64_encoded_image = base64.b64encode(buffer).decode("utf-8")
+        # print(jpg_as_text[:80])
+        returnString = []
+        data = []
+        text = ""
+        image_from_vision = vision.Image(
+            content=base64.b64decode(base64_encoded_image))
+        objects = self.client.object_localization(
+            image=image_from_vision).localized_object_annotations
+        # getting depthestimation data
+        #depth_image = depth_estimation.depth_value(apple_content)
+        # print(depth_image)
+        print('Number of objects found: {}'.format(len(objects)))
+        i = 0
+        for object_ in objects:
+            text = text + " " + object_.name
+            # data.append({"name": object_.name, "x": str((object_.bounding_poly.normalized_vertices[0].x + object_.bounding_poly.normalized_vertices[1].x) / 2), "y": str(
+            #     (object_.bounding_poly.normalized_vertices[0].y + object_.bounding_poly.normalized_vertices[2].y) / 2)})
+            x_t = (object_.bounding_poly.normalized_vertices[0].x +
+                   object_.bounding_poly.normalized_vertices[1].x) / 2
+            y_t = (object_.bounding_poly.normalized_vertices[0].y +
+                   object_.bounding_poly.normalized_vertices[2].y) / 2
+
+            print('\n{} (confidence: {})'.format(object_.name, object_.score))
+            print('Normalized bounding polygon vertices: ')
+            for vertex in object_.bounding_poly.normalized_vertices:
+                print(' - ({}, {})'.format(vertex.x, vertex.y))
+            point3D = pointcloud.get_value(x_t, y_t)
+            print(point3D)
+            round_off_param = 2
+            returnString.append(
+                {"lesson_curiosity_text": object_.name, "name": object_.name, "x": -round(point3D[1][0], round_off_param), "y": -round(point3D[1][1], round_off_param),  "z": -round(point3D[1][2], round_off_param), "visibility": 1})
+            i += 1
+
+        #json_data = json.dumps(data)
+        return returnString
+
+
+# def gcp_localize_objects(base64_encoded_image):
+#     data = []
+#     text = ""
+#     client = vision.ImageAnnotatorClient()
+#     image_from_vision = vision.Image(
+#         content=base64.b64decode(base64_encoded_image))
+#     objects = client.object_localization(
+#         image=image_from_vision).localized_object_annotations
+#     # getting depthestimation data
+#     #depth_image = depth_estimation.depth_value(apple_content)
+#     # print(depth_image)
+#     print('Number of objects found: {}'.format(len(objects)))
+#     i = 0
+#     for object_ in objects:
+#         text = text + " " + object_.name
+#         data.append({"name": object_.name, "x": str((object_.bounding_poly.normalized_vertices[0].x + object_.bounding_poly.normalized_vertices[1].x) / 2), "y": str(
+#             (object_.bounding_poly.normalized_vertices[0].y + object_.bounding_poly.normalized_vertices[2].y) / 2)})
+#         i += 1
+#         print('\n{} (confidence: {})'.format(object_.name, object_.score))
+#         print('Normalized bounding polygon vertices: ')
+#         for vertex in object_.bounding_poly.normalized_vertices:
+#             print(' - ({}, {})'.format(vertex.x, vertex.y))
+#     json_data = json.dumps(data)
+#     return data
+
 # class norfair_yolo_detection(object):
 #     def __init__(self, track_points="bbox"):
 #         self.track_points = track_points
@@ -232,26 +305,3 @@ class resnet_local:
 #             exit(1)
 #         # print(returnString)
 #         return returnString
-
-# # def gcp_localize_objects(base64_encoded_image):
-# #     data = []
-# #     text = ""
-# #     client = vision.ImageAnnotatorClient()
-# #     image_from_vision = vision.Image(content=base64.b64decode(base64_encoded_image) )
-# #     objects = client.object_localization(
-# #         image=image_from_vision).localized_object_annotations
-# #     #getting depthestimation data
-# #     #depth_image = depth_estimation.depth_value(apple_content)
-# #     #print(depth_image)
-# #     print('Number of objects found: {}'.format(len(objects)))
-# #     i=0
-# #     for object_ in objects:
-# #         text = text + " " + object_.name
-# #         data.append({"name": object_.name, "x": str((object_.bounding_poly.normalized_vertices[0].x + object_.bounding_poly.normalized_vertices[1].x) / 2), "y": str((object_.bounding_poly.normalized_vertices[0].y + object_.bounding_poly.normalized_vertices[2].y) / 2)})
-# #         i+=1
-# #         print('\n{} (confidence: {})'.format(object_.name, object_.score))
-# #         print('Normalized bounding polygon vertices: ')
-# #         for vertex in object_.bounding_poly.normalized_vertices:
-# #             print(' - ({}, {})'.format(vertex.x, vertex.y))
-# #     json_data = json.dumps(data)
-# #     return data

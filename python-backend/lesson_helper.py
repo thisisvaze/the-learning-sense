@@ -68,9 +68,10 @@ class lesson_helper_object:
             if lesson_curiosity_text == lesson["lesson"]["lesson_curiosity_text"]:
                 return lesson["lesson"]
 
-    def sendAIGeneratedLesson(self, title, model):
+    def sendAIGeneratedLesson(self, title):
         panel_title = title
-        panel_description = descriptive_answering.openai_text_output("describe " + title + " in 140 characters")
+        panel_description = descriptive_answering.openai_text_output(
+            "describe " + title + " within 140 characters")
         panel_image = image_utilities.getMatchingImageUrl(title)
         # model = {"model_url": get_3d_model.from_sketchfab(
         #     model), "model_name": model}
@@ -80,7 +81,7 @@ class lesson_helper_object:
                 "title": panel_title,
                 "description": panel_description,
                 "image_url": panel_image,
-                "3d_model": model}
+                "3d_model": panel_title}
 
     def handle_speech_message(self, message, context):
         print(message)
@@ -89,7 +90,13 @@ class lesson_helper_object:
                 case CONSTANTS.load_3d_model:
                     return {CONSTANTS.DATA_TYPE: CONSTANTS.SHOW_3D_MODEL, CONSTANTS.DATA_VALUE: message['entities']['3d_model:3d_model'][0]['body']}
                 case CONSTANTS.load_ai_generated_lesson:
-                    return {CONSTANTS.DATA_TYPE: CONSTANTS.LESSON_INIT_INFO, CONSTANTS.DATA_VALUE: self.sendAIGeneratedLesson(message['entities']['lesson_title:lesson_title'][0]['body'], message['entities']['lesson_title:lesson_title'][0]['entities'][0]['body'])}
+                    try:
+                        return {CONSTANTS.DATA_TYPE: CONSTANTS.LESSON_INIT_INFO, CONSTANTS.DATA_VALUE: self.sendAIGeneratedLesson(message['entities']['lesson_title:lesson_title'][0]['body'])}
+                    except:
+                        try:
+                            return {CONSTANTS.DATA_TYPE: CONSTANTS.LESSON_INIT_INFO, CONSTANTS.DATA_VALUE: self.sendAIGeneratedLesson(message['entities']['3d_model:3d_model'][0]['body'])}
+                        except:
+                            return "This case is not handled"
                 case CONSTANTS.modify_user_preferences:
                     context.user_preferences.set(
                         {"topic": message['entities']['topic_of_interest:topic_of_interest'][0]['body']})

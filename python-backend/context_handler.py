@@ -34,6 +34,8 @@ class env_context():
                 self.obj_detection_manager = multiple_object_detection.fb_resnet_detection_hf()
             case CONSTANTS.RESNET_LOCAL:
                 self.obj_detection_manager = multiple_object_detection.resnet_local()
+            case CONSTANTS.GCP_CLOUD:
+                self.obj_detection_manager = multiple_object_detection.gcp_cloud()
         self.sensor_connection_manager = sensor_connection_manager
 
     def getDefaultParameters(self):

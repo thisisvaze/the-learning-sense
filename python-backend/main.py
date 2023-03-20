@@ -7,7 +7,7 @@ from email.mime import image
 from fastapi import FastAPI, UploadFile, WebSocket, File, Request
 from sympy import Q
 import api.ocr_recognition as ocr_recognition
-from api import get_3d_model
+from api import get_3d_model, embodied_chat_agent
 # from api.norfair_utilities import YOLO, yolo_detections_to_norfair_detections, names
 from fastapi.responses import PlainTextResponse
 import os
@@ -64,14 +64,16 @@ wit = text_intent_classification.wit_utilities()
 
 
 # Init hololens connection
-#connection_manager = hololens_sensor_connection.HololensConnectionManager(
- #   show_stream=False)
+# connection_manager = hololens_sensor_connection.HololensConnectionManager(
+#   show_stream=False)
 connection_manager = zed_sensor_connection.ZedConnectionManager()
 
 context_handler_obj = context_handler.context(
     sensor_connection_manager=connection_manager)
 
 lesson_manager = lesson_helper.lesson_helper_object()
+
+chat_agent = embodied_chat_agent.emobodied_object_helper()
 
 
 def sendDataToUnity(tag, data):
@@ -93,11 +95,20 @@ async def websocket_endpoint(websocket: WebSocket):
             context_handler_obj.session.state = CONSTANTS.SESSION_STATE_LESSON_INITIATED
 
         elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.SPEECH_SENTENCE_SPOKEN:
-            # and context_handler_obj.session.state == CONSTANTS.SESSION_STATE_LESSON_INITIATED:
-            data = lesson_manager.handle_speech_message(
-                wit.infer_message(json_data[CONSTANTS.DATA_VALUE]), context_handler_obj)
-            print(data)
-            await websocket.send_text(f"{data}")
+            if context_handler_obj.session.state == CONSTANTS.SESSION_EMBODIED_CHAT:
+                if str(json_data[CONSTANTS.DATA_VALUE]).lower() == "bye":
+                    context_handler_obj.session.state = CONSTANTS.SESSION_STATE_EXPLORE
+                    data = "Bye"
+                    await websocket.send_text(f"{sendDataToUnity(CONSTANTS.END_EMBODIED_CHAT,data)}")
+
+                data = chat_agent.chat_response(
+                    json_data[CONSTANTS.DATA_VALUE])
+                await websocket.send_text(f"{sendDataToUnity(CONSTANTS.EMBODIED_CHAT_DATA_UPDATE,data)}")
+            else:
+                # and context_handler_obj.session.state == CONSTANTS.SESSION_STATE_LESSON_INITIATED:
+                data = lesson_manager.handle_speech_message(
+                    wit.infer_message(json_data[CONSTANTS.DATA_VALUE]), context_handler_obj)
+                await websocket.send_text(f"{data}")
 
         elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.REQUEST_ENV_INFO_UPDATE:
             data = {"Items": lesson_manager.sendEnvUpdateWithCuriosity(context_handler_obj.user_preferences.data,
@@ -111,6 +122,12 @@ async def websocket_endpoint(websocket: WebSocket):
             data = {"model_url": get_3d_model.from_sketchfab(
                 json_data[CONSTANTS.DATA_VALUE]), "model_name": json_data[CONSTANTS.DATA_VALUE]}
             await websocket.send_text(f"{sendDataToUnity(CONSTANTS.DOWNLOAD_AND_SHOW_3D_MODEL,data)}")
+
+        elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.INITIATE_EMBOIDIED_CHAT:
+            context_handler_obj.session.state = CONSTANTS.SESSION_EMBODIED_CHAT
+            chat_agent.setObject(json_data[CONSTANTS.DATA_VALUE])
+            data = chat_agent.chat_response("Hey there! Introduce Yourself.")
+            await websocket.send_text(f"{sendDataToUnity(CONSTANTS.EMBODIED_CHAT_DATA_UPDATE,data)}")
 
         elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.SET_USER_PREFERENCES:
             context_handler_obj.user_preferences.set(

@@ -1,2 +1,4 @@
-export GOOGLE_APPLICATION_CREDENTIALS="/Users/vaze/desktop/thesis-server-code/smartglasses-education/keys/thesis-gcp-api-97828526cbc3.json" 
+set GOOGLE_APPLICATION_CREDENTIALS='C:\Users\student\Desktop\the-learning-dimension\python-backend\keys\thesis-gcp-api-97828526cbc3.json'
+
+
 
