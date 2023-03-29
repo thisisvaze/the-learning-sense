@@ -126,7 +126,7 @@ class VideoStream():
         #     input_type.set_from_svo_file(sys.argv[1])
         init = sl.InitParameters(input_t=input_type)
         init.camera_resolution = sl.RESOLUTION.HD720
-        init.depth_mode = sl.DEPTH_MODE.PERFORMANCE
+        init.depth_mode = sl.DEPTH_MODE.QUALITY
         init.coordinate_units = sl.UNIT.METER
 
         # Open the camera
@@ -141,7 +141,7 @@ class VideoStream():
 
         # Set runtime parameters after opening the camera
         self.runtime = sl.RuntimeParameters()
-        self.runtime.sensing_mode = sl.SENSING_MODE.STANDARD
+        self.runtime.sensing_mode = sl.SENSING_MODE.FILL
 
         # Prepare new image size to retrieve half-resolution images
         self.image_size = self.zed.get_camera_information().camera_resolution

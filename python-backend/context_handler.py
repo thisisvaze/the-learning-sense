@@ -20,7 +20,7 @@ class context():
         self.session = session()
         self.sensor_connection_manager = sensor_connection_manager
         self.env_context = env_context(
-            self.sensor_connection_manager, obj_detection=CONSTANTS.RESNET_LOCAL)
+            self.sensor_connection_manager, obj_detection=CONSTANTS.FB_RESNET50_HF)
         self.user_preferences = Preferences()
         self.session.state = CONSTANTS.SESSION_STATE_EXPLORE
 

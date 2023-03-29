@@ -12,9 +12,10 @@ class Preferences():
             json.dump(self.data, user_pref)
         return json.dumps(self.data)
 
+
 def main():
     pref = Preferences(1)
-    print(pref.data["subject"])
+    print(pref.data["topic"])
 
 
 if __name__ == "__main__":

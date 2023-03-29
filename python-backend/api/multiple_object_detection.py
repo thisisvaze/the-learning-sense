@@ -49,25 +49,25 @@ class resnet_local:
                     y1 = box[1]
                     x2 = box[2]
                     y2 = box[3]
+                    print(x1, x2, y1, y2)
                     label_name = self.model.config.id2label[label.item()]
-                    # if pointcloud == None:
-                    #     round_off_param = 2
-                    #     returnString.append(
-                    #         {"lesson_curiosity_text": label_name, "name": label_name, "x": (((x1+x2)/216)-1), "y": (1-((y1+y2)/120))*0.5,  "z": -round(0.8, round_off_param), "visibility": 1})
-                    # else:
-                    point3D = pointcloud.get_value((x1+x2)/2, (y1+y2)/2)
-                    # print(point3D)
-                    round_off_param = 2
-                    returnString.append(
-                        {"lesson_curiosity_text": label_name, "name": label_name, "x": -round(point3D[1][0], round_off_param), "y": -round(point3D[1][1], round_off_param),  "z": -round(point3D[1][2], round_off_param), "visibility": 1})
+                    if label_name != "person":
+                        point3D = pointcloud.get_value((x1+x2)//2, (y1+y2)//2)
+                        #point3D = eval(str(point3D))
+                        round_off_param = 2
+                        returnString.append(
+                            {"lesson_curiosity_text": label_name, "name": label_name, "x": -round(point3D[1][0], round_off_param), "y": -round(point3D[1][1], round_off_param),  "z": -round(point3D[1][2], round_off_param), "visibility": 1})
+                        # returnString.append(
+                        # {"lesson_curiosity_text": label_name, "name": label_name, "x": -round(point3D["x"]/1000, round_off_param), "y": -round(point3D["y"]/1000, round_off_param),  "z": -round(point3D["z"]/1000, round_off_param), "visibility": 1})
+
         except:
             returnString.append(
                 {"name": "lost track"})
-        # cv2.imshow("Frame", frame)
-        # key = cv2.waitKey(1)
-        # if key == ord('q'):
-        #     cv2.destroyAllWindows()
-        #     exit(1)
+        cv2.imshow("Frame", frame)
+        key = cv2.waitKey(1)
+        if key == ord('q'):
+            cv2.destroyAllWindows()
+            exit(1)
         return returnString
 
 
@@ -97,23 +97,35 @@ class gcp_cloud:
             text = text + " " + object_.name
             # data.append({"name": object_.name, "x": str((object_.bounding_poly.normalized_vertices[0].x + object_.bounding_poly.normalized_vertices[1].x) / 2), "y": str(
             #     (object_.bounding_poly.normalized_vertices[0].y + object_.bounding_poly.normalized_vertices[2].y) / 2)})
-            x_t = (object_.bounding_poly.normalized_vertices[0].x +
-                   object_.bounding_poly.normalized_vertices[1].x) / 2
-            y_t = (object_.bounding_poly.normalized_vertices[0].y +
-                   object_.bounding_poly.normalized_vertices[2].y) / 2
+            x_t = int(((object_.bounding_poly.normalized_vertices[0].x +
+                        object_.bounding_poly.normalized_vertices[1].x) / 2) * 1280)
+            y_t = int(((object_.bounding_poly.normalized_vertices[0].y +
+                        object_.bounding_poly.normalized_vertices[2].y) / 2) * 720)
 
             print('\n{} (confidence: {})'.format(object_.name, object_.score))
             print('Normalized bounding polygon vertices: ')
             for vertex in object_.bounding_poly.normalized_vertices:
                 print(' - ({}, {})'.format(vertex.x, vertex.y))
+            print("THIS IS HERE", x_t, y_t)
             point3D = pointcloud.get_value(x_t, y_t)
+            #point3D = eval(str(point3D))
             print(point3D)
             round_off_param = 2
             returnString.append(
                 {"lesson_curiosity_text": object_.name, "name": object_.name, "x": -round(point3D[1][0], round_off_param), "y": -round(point3D[1][1], round_off_param),  "z": -round(point3D[1][2], round_off_param), "visibility": 1})
+            # returnString.append(
+            # {"lesson_curiosity_text": object_.name, "name": object_.name, "x": -round(point3D["x"]/1000, round_off_param), "y": -round(point3D["y"]/1000, round_off_param),  "z": -round(point3D["z"]/1000, round_off_param), "visibility": 1})
+
             i += 1
 
         #json_data = json.dumps(data)
+        cv2.imshow("Frame", frame)
+        #print("multiple_object_detection:" + str(returnString))
+        key = cv2.waitKey(1)
+        if key == ord('q'):
+            cv2.destroyAllWindows()
+            exit(1)
+        # print(returnString)
         return returnString
 
 
@@ -256,52 +268,46 @@ class gcp_cloud:
 # #     def __init__(self):
 
 
-# class fb_resnet_detection_hf:
-#     def __init__(self) -> None:
-#         pass
+class fb_resnet_detection_hf:
+    def __init__(self) -> None:
+        pass
 
-#     def trackMultipleObjects(self, frame, sensor, pointcloud=None, language="English", gaze_coordinates="(0,0,0)"):
-#         translator_utility = lang_translator.translation()
+    def trackMultipleObjects(self, frame, pointcloud=None):
 
-#         retval, buffer = cv2.imencode('.jpg', frame)
-#         API_TOKEN = "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"
-#         API_URL = "https://api-inference.huggingface.co/models/facebook/detr-resnet-50"
-#         headers = {"Authorization": f"Bearer {API_TOKEN}"}
-#         response = requests.request(
-#             "POST", API_URL, headers=headers, data=buffer)
-#         data = []
-#         print(response)
-#         if sensor == "zed":
-#             returnString = []
-#             try:
-#                 for result in json.loads(response.content.decode("utf-8")):
-#                     # print(result)
-#                     x1 = int(result["box"]["xmin"])
-#                     x2 = int(result["box"]["xmax"])
-#                     y1 = int(result["box"]["ymin"])
-#                     y2 = int(result["box"]["ymax"])
+        retval, buffer = cv2.imencode('.jpg', frame)
+        API_TOKEN = "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"
+        API_URL = "https://api-inference.huggingface.co/models/facebook/detr-resnet-50"
+        headers = {"Authorization": f"Bearer {API_TOKEN}"}
+        response = requests.post(
+            API_URL, headers=headers, data=buffer.tobytes())
+        print(response)
+        returnString = []
+        try:
+            for result in json.loads(response.content.decode("utf-8")):
+                # print(result)
+                x1 = int(result["box"]["xmin"])
+                x2 = int(result["box"]["xmax"])
+                y1 = int(result["box"]["ymin"])
+                y2 = int(result["box"]["ymax"])
 
-#                     # data.append({"name": result["label"], "x": (
-#                     #     result["box"]["xmin"] + result["box"]["xmax"]) / 856, "y": result["box"]["ymin"]/240})
-#                     point3D = pointcloud.get_value((x1+x2)/2, (y1+y2)/2)
-#                     # print(point3D)
-#                     round_off_param = 2
-#                     if language == "English":
-#                         returnString.append(
-#                             {"lesson_curiosity_text": result["label"], "name": result["label"], "x": -round(point3D[1][0], round_off_param), "y": -round(point3D[1][1], round_off_param),  "z": -round(point3D[1][2], round_off_param), "visibility": 1})
-#                     else:
-#                         returnString.append(
-#                             {"lesson_curiosity_text": result["label"], "name": result["label"], "x": -round(point3D[1][0], round_off_param), "y": -round(point3D[1][1], round_off_param),  "z": -round(point3D[1][2], round_off_param), "visibility": 1})
+                point3D = pointcloud.get_value((x1+x2)//2, (y1+y2)//2)
+                round_off_param = 2
+                returnString.append(
+                    {"lesson_curiosity_text": result["label"], "name": result["label"], "x": -round(point3D[1][0], round_off_param), "y": -round(point3D[1][1], round_off_param),  "z": -round(point3D[1][2], round_off_param), "visibility": 1})
+                # # point3D = eval(str(point3D))
+                # round_off_param = 3
+                # # returnString.append(
+                #     {"lesson_curiosity_text": result["label"], "name": result["label"], "x": -round(point3D["x"]/1000, round_off_param), "y": -round(point3D["y"]/1000, round_off_param),  "z": -round(point3D["z"]/1000, round_off_param), "visibility": 1})
 
-#             except:
-#                 returnString.append(
-#                     {"name": "lost track"})
+        except:
+            returnString.append(
+                {"name": "lost track"})
 
-#         cv2.imshow("Frame", frame)
-#         #print("multiple_object_detection:" + str(returnString))
-#         key = cv2.waitKey(1)
-#         if key == ord('q'):
-#             cv2.destroyAllWindows()
-#             exit(1)
-#         # print(returnString)
-#         return returnString
+        #cv2.imshow("Frame", frame)
+        #print("multiple_object_detection:" + str(returnString))
+        # key = cv2.waitKey(1)
+        # if key == ord('q'):
+        #     cv2.destroyAllWindows()
+        #     exit(1)
+        # print(returnString)
+        return returnString

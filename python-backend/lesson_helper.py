@@ -10,6 +10,8 @@ class lesson_helper_object:
     def __init__(self):
         with open("lessons.json") as lessons:
             self.lessons = json.load(lessons)
+        with open("cxr_pref.json") as cxr_preferences:
+            self.cxr_preferences = json.load(cxr_preferences)
         self.translation_utility = text_translate.translation()
 
     def add_lesson(self, json_data):
@@ -17,6 +19,12 @@ class lesson_helper_object:
         with open("lessons.json", "w") as file:
             json.dump(self.lessons, file)
         return json.dumps(self.lessons)
+
+    def modify_cxr_pref(self, data):
+        self.cxr_preferences = data
+        with open("user_pref.json", "w") as user_pref:
+            json.dump(self.cxr_preferences, user_pref)
+        return json.dumps(self.cxr_preferences)
 
     def selectSemanticLessonforEnvObject(self, recognized_object_name, user_pref):
         relevant_lessons = []
@@ -49,13 +57,14 @@ class lesson_helper_object:
         #         recognized_object["lesson_curiosity_text"] = self.translation_utility.thisText(
         #             recognized_object["name"], user_pref['topic_of_interest'])
         # else:
-        for recognized_object in data:
-            d = self.selectSemanticLessonforEnvObject(
-                recognized_object["name"], user_pref)
-            if d != "None":
-                recognized_object["lesson_curiosity_text"] = d["lesson_curiosity_text"]
-            else:
-                recognized_object["visibility"] = 0
+        if self.cxr_preferences["mode"] == "EDUCATOR":
+            for recognized_object in data:
+                d = self.selectSemanticLessonforEnvObject(
+                    recognized_object["name"], user_pref)
+                if d != "None":
+                    recognized_object["lesson_curiosity_text"] = d["lesson_curiosity_text"]
+                else:
+                    recognized_object["visibility"] = 0
         return data
 
     # def sendSpeechToUnity(query):
@@ -63,10 +72,20 @@ class lesson_helper_object:
     #     tts = text_to_speech.tts_fairseq()
     #     tts.predict(spoken_results)
 
-    def sendLesson(self, lesson_curiosity_text):
-        for lesson in self.lessons:
-            if lesson_curiosity_text == lesson["lesson"]["lesson_curiosity_text"]:
-                return lesson["lesson"]
+    def sendLesson(self, lesson_curiosity_text, user_pref):
+        if self.cxr_preferences["mode"] == "AI":
+            ret = descriptive_answering.openai_direct_lesson_generation(
+                lesson_curiosity_text, user_pref["topic"])
+            ret["image_url"] = image_utilities.getMatchingImageUrl(
+                ret["image_name"])
+            ret.pop("image_name")
+            ret["template"] = "TITLE_DESCRIPTION_IMAGE_MODEL"
+            ret["lesson_id"] = "999"
+            return ret
+        else:
+            for lesson in self.lessons:
+                if lesson_curiosity_text == lesson["lesson"]["lesson_curiosity_text"]:
+                    return lesson["lesson"]
 
     def sendAIGeneratedLesson(self, title):
         panel_title = title
@@ -82,6 +101,33 @@ class lesson_helper_object:
                 "description": panel_description,
                 "image_url": panel_image,
                 "3d_model": panel_title}
+
+    def handle_speech_message_with_gpt(self, message, context):
+        message = descriptive_answering.openai_end_to_end_gpt(message)
+        print(message)
+        try:
+            match message["intent_name"]:
+                case CONSTANTS.CLEAR_SPACE:
+                    return {CONSTANTS.DATA_TYPE: "MODIFY_LESSON_STATE", CONSTANTS.DATA_VALUE: "END_LESSON"}
+
+                case CONSTANTS.DELETE_MODEL:
+                    return {CONSTANTS.DATA_TYPE: "DELETE_MODEL", CONSTANTS.DATA_VALUE: "info"}
+
+                case CONSTANTS.INTERACTIVE_QUERY_RESPONSE:
+                    try:
+                        message["info"]["image_url"] = image_utilities.getMatchingImageUrl(
+                            message["info"].pop("image_name"))
+                    except:
+                        pass
+                    return {CONSTANTS.DATA_TYPE: "INTERACTIVE_QUERY_RESPONSE", CONSTANTS.DATA_VALUE: message["info"]}
+
+                case CONSTANTS.MODIFY_USER_PREFERENCES:
+                    context.user_preferences.set(
+                        {"topic": message["topic"]})
+                    return {CONSTANTS.DATA_TYPE: "SPEECH_HANDLED_IN_SERVER", CONSTANTS.DATA_VALUE: str(context.user_preferences.data)}
+
+        except:
+            return "Speech handling error"
 
     def handle_speech_message(self, message, context):
         print(message)

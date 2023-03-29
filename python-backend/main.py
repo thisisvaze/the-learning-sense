@@ -40,6 +40,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 
 from zed import zed_sensor_connection
+from kinect import kinect_sensor_connection
 import lesson_helper
 import context_handler
 import lesson_helper
@@ -68,6 +69,9 @@ wit = text_intent_classification.wit_utilities()
 #   show_stream=False)
 connection_manager = zed_sensor_connection.ZedConnectionManager()
 
+# KNECT connection manager
+#connection_manager = kinect_sensor_connection.KinectConnectionManager()
+
 context_handler_obj = context_handler.context(
     sensor_connection_manager=connection_manager)
 
@@ -91,24 +95,29 @@ async def websocket_endpoint(websocket: WebSocket):
         json_data = json.loads(data)
         if json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.INITIATE_LESSON_REQUEST:
             context_handler_obj.session.state = CONSTANTS.SESSION_STATE_INITIATING_LESSON
-            await websocket.send_text(f"{sendDataToUnity(CONSTANTS.LESSON_INIT_INFO,lesson_manager.sendLesson(json_data[CONSTANTS.DATA_VALUE]))}")
+            await websocket.send_text(f"{sendDataToUnity(CONSTANTS.LESSON_INIT_INFO,lesson_manager.sendLesson(json_data[CONSTANTS.DATA_VALUE], context_handler_obj.user_preferences.data))}")
             context_handler_obj.session.state = CONSTANTS.SESSION_STATE_LESSON_INITIATED
 
         elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.SPEECH_SENTENCE_SPOKEN:
-            if context_handler_obj.session.state == CONSTANTS.SESSION_EMBODIED_CHAT:
-                if str(json_data[CONSTANTS.DATA_VALUE]).lower() == "bye":
-                    context_handler_obj.session.state = CONSTANTS.SESSION_STATE_EXPLORE
-                    data = "Bye"
-                    await websocket.send_text(f"{sendDataToUnity(CONSTANTS.END_EMBODIED_CHAT,data)}")
+            # if context_handler_obj.session.state == CONSTANTS.SESSION_EMBODIED_CHAT:
+            #     if str(json_data[CONSTANTS.DATA_VALUE]).lower() == "bye":
+            #         context_handler_obj.session.state = CONSTANTS.SESSION_STATE_EXPLORE
+            #         data = "Bye"
+            #         await websocket.send_text(f"{sendDataToUnity(CONSTANTS.END_EMBODIED_CHAT,data)}")
 
-                data = chat_agent.chat_response(
-                    json_data[CONSTANTS.DATA_VALUE])
-                await websocket.send_text(f"{sendDataToUnity(CONSTANTS.EMBODIED_CHAT_DATA_UPDATE,data)}")
-            else:
-                # and context_handler_obj.session.state == CONSTANTS.SESSION_STATE_LESSON_INITIATED:
-                data = lesson_manager.handle_speech_message(
-                    wit.infer_message(json_data[CONSTANTS.DATA_VALUE]), context_handler_obj)
-                await websocket.send_text(f"{data}")
+            #     data = chat_agent.chat_response(
+            #         json_data[CONSTANTS.DATA_VALUE])
+            #     await websocket.send_text(f"{sendDataToUnity(CONSTANTS.EMBODIED_CHAT_DATA_UPDATE,data)}")
+            # else:
+            # and context_handler_obj.session.state == CONSTANTS.SESSION_STATE_LESSON_INITIATED:
+
+            data = lesson_manager.handle_speech_message_with_gpt(
+                json_data[CONSTANTS.DATA_VALUE], context_handler_obj)
+
+            # data = lesson_manager.handle_speech_message(
+            #     wit.infer_message(json_data[CONSTANTS.DATA_VALUE]), context_handler_obj)
+
+            await websocket.send_text(f"{data}")
 
         elif json_data[CONSTANTS.DATA_TYPE] == CONSTANTS.REQUEST_ENV_INFO_UPDATE:
             data = {"Items": lesson_manager.sendEnvUpdateWithCuriosity(context_handler_obj.user_preferences.data,
@@ -161,6 +170,12 @@ async def main():
 @ app.get("/get_user_preferences")
 async def main():
     return context_handler_obj.user_preferences.data
+
+
+@ app.post("/modify_mode")
+async def main(new_mode_data: Request):
+    data = await new_mode_data.json()
+    return lesson_manager.modify_cxr_pref(data)
 
 
 @ app.post("/send_env_context")
