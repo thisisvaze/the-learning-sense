@@ -66,7 +66,7 @@ wit = text_intent_classification.wit_utilities()
 
 # Init hololens connection
 # connection_manager = hololens_sensor_connection.HololensConnectionManager(
-#   show_stream=False)
+#     show_stream=False)
 connection_manager = zed_sensor_connection.ZedConnectionManager()
 
 # KNECT connection manager
@@ -170,6 +170,11 @@ async def main():
 @ app.get("/get_user_preferences")
 async def main():
     return context_handler_obj.user_preferences.data
+
+
+@ app.get("/get_system_preferences")
+async def main():
+    return lesson_manager.cxr_preferences
 
 
 @ app.post("/modify_mode")

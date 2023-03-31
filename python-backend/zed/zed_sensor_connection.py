@@ -126,7 +126,7 @@ class VideoStream():
         #     input_type.set_from_svo_file(sys.argv[1])
         init = sl.InitParameters(input_t=input_type)
         init.camera_resolution = sl.RESOLUTION.HD720
-        init.depth_mode = sl.DEPTH_MODE.QUALITY
+        init.depth_mode = sl.DEPTH_MODE.PERFORMANCE
         init.coordinate_units = sl.UNIT.METER
 
         # Open the camera
@@ -174,6 +174,7 @@ class VideoStream():
                 self.zed.retrieve_measure(
                     self.point_cloud, sl.MEASURE.XYZRGBA, sl.MEM.CPU, self.image_size)
                 self.frame = self.image_zed.get_data()
+                self.frame = cv2.flip(self.frame, 0)
                 #self.last_updated_point_cloud = self.point_cloud.copy()
                 #self.last_updated_point_cloud = copy.deepcopy(self.point_cloud)
                 #print("zed_sensor_connection:" + str(self.point_cloud))

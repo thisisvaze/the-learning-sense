@@ -49,15 +49,20 @@ class resnet_local:
                     y1 = box[1]
                     x2 = box[2]
                     y2 = box[3]
-                    print(x1, x2, y1, y2)
+                    #print(x1, x2, y1, y2)
                     label_name = self.model.config.id2label[label.item()]
-                    if label_name != "person":
-                        point3D = pointcloud.get_value((x1+x2)//2, (y1+y2)//2)
-                        #point3D = eval(str(point3D))
-                        round_off_param = 2
-                        returnString.append(
-                            {"lesson_curiosity_text": label_name, "name": label_name, "x": -round(point3D[1][0], round_off_param), "y": -round(point3D[1][1], round_off_param),  "z": -round(point3D[1][2], round_off_param), "visibility": 1})
-                        # returnString.append(
+                    if label_name != "person" and label_name != "remote" and label_name != "dining table":
+                        try:
+                            point3D = pointcloud.get_value(
+                                (x1+x2)/2, (y1+y2)/2)
+                            #point3D = eval(str(point3D))
+                            round_off_param = 2
+                            returnString.append(
+                                {"lesson_curiosity_text": label_name, "name": label_name, "x": -round(point3D[1][0], round_off_param), "y": round(point3D[1][1], round_off_param),  "z": -round(point3D[1][2], round_off_param), "visibility": 1})
+
+                        except:
+                            returnString.append("aa")
+                         # returnString.append(
                         # {"lesson_curiosity_text": label_name, "name": label_name, "x": -round(point3D["x"]/1000, round_off_param), "y": -round(point3D["y"]/1000, round_off_param),  "z": -round(point3D["z"]/1000, round_off_param), "visibility": 1})
 
         except:
@@ -303,11 +308,11 @@ class fb_resnet_detection_hf:
             returnString.append(
                 {"name": "lost track"})
 
-        #cv2.imshow("Frame", frame)
-        #print("multiple_object_detection:" + str(returnString))
-        # key = cv2.waitKey(1)
-        # if key == ord('q'):
-        #     cv2.destroyAllWindows()
-        #     exit(1)
+        cv2.imshow("Frame", frame)
+        print("multiple_object_detection:" + str(returnString))
+        key = cv2.waitKey(1)
+        if key == ord('q'):
+            cv2.destroyAllWindows()
+            exit(1)
         # print(returnString)
         return returnString

@@ -22,8 +22,8 @@ class lesson_helper_object:
 
     def modify_cxr_pref(self, data):
         self.cxr_preferences = data
-        with open("user_pref.json", "w") as user_pref:
-            json.dump(self.cxr_preferences, user_pref)
+        with open("cxr_pref.json", "w") as crx_pref:
+            json.dump(self.cxr_preferences, crx_pref)
         return json.dumps(self.cxr_preferences)
 
     def selectSemanticLessonforEnvObject(self, recognized_object_name, user_pref):
@@ -33,7 +33,7 @@ class lesson_helper_object:
                 if lesson_initiation_object == recognized_object_name:
                     relevant_lessons.append(lesson)
         most_relevant_lesson = self.get_lesson_with_highest_semantic_score(
-            {user_pref["topic"]}, relevant_lessons)
+            user_pref["topic"], relevant_lessons)
         if most_relevant_lesson == None:
             return "None"
         return most_relevant_lesson["lesson"]
@@ -166,33 +166,30 @@ class lesson_helper_object:
         except:
             return "This case is not handled"
 
-    def get_lesson_with_highest_semantic_score(self, tags, lessons):
+    def get_lesson_with_highest_semantic_score(self, user_pref_topic, lessons):
         max_score = -1
         best_lesson = None
         # Calculate the semantic score for each lesson
         for lesson in lessons:
-            score = 0
-            for tag in tags:
-                # get the first synset for the tag
-                tag_synset = wordnet.synsets(tag)[0]
-                # get the synsets for each word in the lesson
-                lesson_synsets = [wordnet.synsets(
-                    word) for word in lesson["tags"]]
-                # flatten the list of synsets
-                lesson_synsets = [
-                    synset for synsets in lesson_synsets for synset in synsets]
-                # Calculate the similarity between the tag and each word in the lesson
-                similarities = [tag_synset.path_similarity(
-                    lesson_synset) for lesson_synset in lesson_synsets]
-                # get the highest similarity, or 0 if no similarities were found
-                max_similarity = max(similarities) if any(similarities) else 0
-                #score += max_similarity
-                if score < max_similarity:
-                    score = max_similarity
+            # get the first synset for the tag
+            tag_synset = wordnet.synsets(user_pref_topic)[0]
+            # get the synsets for each word in the lesson
+            lesson_synsets = [wordnet.synsets(
+                word) for word in lesson["tags"]]
+            # flatten the list of synsets
+            lesson_synsets = [
+                synset for synsets in lesson_synsets for synset in synsets]
+            # Calculate the similarity between the tag and each word in the lesson
+            similarities = [tag_synset.path_similarity(
+                lesson_synset) for lesson_synset in lesson_synsets]
+            # get the highest similarity, or 0 if no similarities were found
+            score = max(similarities) if any(similarities) else 0
+            #score += max_similarity
             # Update the best lesson if this one has a higher score
             if score > max_score:
                 max_score = score
                 best_lesson = lesson
+        print(best_lesson)
         return best_lesson
 
 
