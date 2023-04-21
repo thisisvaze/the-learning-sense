@@ -38,20 +38,23 @@ def openai_end_to_end_gpt(query):
 
 
 def openai_direct_lesson_generation(object_name, preference_topic):
-    query = "Return only a JSON. Teach me an interesting short lesson that teaches me something about " + preference_topic + " related to " + object_name + \
-        ". Return 4 parameters, lesson_question_title, learning_content (strictly < 140 characters), sketchfab_model_name (to add concept support visualization related to " + \
-        preference_topic + \
-            ", and image_name (without extensions). Replace underscore by space for sketchfab_model_name. Do not add explanatory text. Don't include hashtags."
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": query}]
-    )
-    res = response["choices"][0]["message"]["content"]
-    json_response = json.loads(res)
-    json_response["description"] = json_response.pop("learning_content")
-    json_response["title"] = json_response.pop("lesson_question_title")
-    json_response["3d_model"] = json_response.pop("sketchfab_model_name")
-    return json_response
+    try:
+        query = "Return only a JSON. Teach me an interesting short lesson that teaches me something about " + preference_topic + " related to " + object_name + \
+            ". Return 4 parameters, lesson_question_title, learning_content (strictly < 140 characters), sketchfab_model_name (to add concept support visualization related to " + \
+            preference_topic + \
+                ", and image_name (without extensions). Replace underscore by space for sketchfab_model_name. Do not add explanatory text. Don't include hashtags."
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": query}]
+        )
+        res = response["choices"][0]["message"]["content"]
+        json_response = json.loads(res)
+        json_response["description"] = json_response.pop("learning_content")
+        json_response["title"] = json_response.pop("lesson_question_title")
+        json_response["3d_model"] = json_response.pop("sketchfab_model_name")
+        return json_response
+    except:
+        return "No lesson found"
 
 
 def fact_generator(topic, object_name):

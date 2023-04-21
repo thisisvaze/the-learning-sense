@@ -63,11 +63,14 @@ class sketchfab():
         return "no_valid_model_found"
 
     def getBestModelFileURL(self, UID):
-        headers = {'Authorization': "Bearer "+access_token}
-        URL = " https://api.sketchfab.com/v3/models/"+UID+"/download"
-        response = requests.get(url=URL, headers=headers).json()
-        print(response["glb"]["url"])
-        return response["glb"]["url"]
+        try:
+            headers = {'Authorization': "Bearer "+access_token}
+            URL = " https://api.sketchfab.com/v3/models/"+UID+"/download"
+            response = requests.get(url=URL, headers=headers).json()
+            print(response["glb"]["url"])
+            return response["glb"]["url"]
+        except:
+            return "null"
         # print(response)
         # parsing response
         model_url = ""

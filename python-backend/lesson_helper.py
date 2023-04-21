@@ -27,16 +27,19 @@ class lesson_helper_object:
         return json.dumps(self.cxr_preferences)
 
     def selectSemanticLessonforEnvObject(self, recognized_object_name, user_pref):
-        relevant_lessons = []
-        for lesson in self.lessons:
-            for lesson_initiation_object in lesson["objects"]:
-                if lesson_initiation_object == recognized_object_name:
-                    relevant_lessons.append(lesson)
-        most_relevant_lesson = self.get_lesson_with_highest_semantic_score(
-            user_pref["topic"], relevant_lessons)
-        if most_relevant_lesson == None:
-            return "None"
-        return most_relevant_lesson["lesson"]
+        try:
+            relevant_lessons = []
+            for lesson in self.lessons:
+                for lesson_initiation_object in lesson["objects"]:
+                    if lesson_initiation_object == recognized_object_name:
+                        relevant_lessons.append(lesson)
+            most_relevant_lesson = self.get_lesson_with_highest_semantic_score(
+                user_pref["topic"].split()[0], relevant_lessons)
+            if most_relevant_lesson == None:
+                return "None"
+            return most_relevant_lesson["lesson"]
+        except:
+            "None"
 
     def selectLessonforEnvObject(self, recognized_object_name, user_pref):
         lesson_interest_relevancy = False
@@ -59,11 +62,14 @@ class lesson_helper_object:
         # else:
         if self.cxr_preferences["mode"] == "EDUCATOR":
             for recognized_object in data:
-                d = self.selectSemanticLessonforEnvObject(
-                    recognized_object["name"], user_pref)
-                if d != "None":
-                    recognized_object["lesson_curiosity_text"] = d["lesson_curiosity_text"]
-                else:
+                try:
+                    d = self.selectSemanticLessonforEnvObject(
+                        recognized_object["name"], user_pref)
+                    if d != "None":
+                        recognized_object["lesson_curiosity_text"] = d["lesson_curiosity_text"]
+                    else:
+                        recognized_object["visibility"] = 0
+                except:
                     recognized_object["visibility"] = 0
         return data
 
